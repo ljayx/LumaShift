@@ -1,10 +1,17 @@
 import {createPalette,parseSimple,propertyRole} from './colors.js';
+import {declarations,sourceDeclarations,hasPendingColors,isThinPaint} from './declarations.js';
 
 const marker='data-lumashift';
 const roles=['bg','text','border','shadow'];
 const inlineAttribute='data-lumashift-inline';
-const variableShorthands=['background','border','border-top','border-right','border-bottom','border-left','outline'];
-const inlineProperties=['color',...variableShorthands,'background-color','background-image','border-color','border-top-color','border-right-color','border-bottom-color','border-left-color','outline-color','box-shadow','text-shadow','fill','stroke','caret-color','text-decoration-color','-webkit-text-fill-color'];
+const variableShorthands=['background','border','border-top','border-right','border-bottom','border-left','border-block','border-inline','border-block-start','border-block-end','border-inline-start','border-inline-end','outline'];
+const inlineProperties=['color',...variableShorthands,'background-color','background-image','background-position','background-position-x','background-position-y','background-size','background-repeat','background-attachment','background-origin','background-clip','border-color',...['top','right','bottom','left','block','inline','block-start','block-end','inline-start','inline-end'].flatMap(side=>['color','width','style'].map(kind=>`border-${side}-${kind}`)),'border-width','border-style','outline-color','outline-width','outline-style','box-shadow','text-shadow','fill','stroke','stop-color','caret-color','text-decoration-color','-webkit-text-fill-color'];
+const svgProperties=['fill','stroke','stop-color','color'];
+const svgSelector='svg,[fill],[stroke],[stop-color]';
+const svgProtected='mask,clipPath,filter';
+// Presentation attributes have zero specificity and precede author CSS. Do
+// not force them over stylesheet/hover rules or rewrite mask luminance.
+const svgRules=svgProperties.map(p=>`:where([${inlineAttribute}~="svg-${p}"]){${p}:var(--luma-svg-${p})}`).join('\n');
 const inlineRules=inlineProperties.map(p=>`[${inlineAttribute}~="${p}"]{${p}:var(--luma-inline-${p})!important}`).join('\n');
 const legacyRules=`:where([${inlineAttribute}~="legacy-bg"]){background-color:var(--luma-legacy-bg)}:where([${inlineAttribute}~="legacy-text"]){color:var(--luma-legacy-text)}`;
 
@@ -46,12 +53,12 @@ export class ThemeEngine {
   addRoot(root) {
     if(this.roots.has(root)||!this.active)return;
     const {background,text}=this.settings;
-    const base=this.makeStyle(root,(root===document?`html{background:${background};color:${text};color-scheme:dark}body{background:${background};color:${text}}`:'')+`:where(a:link){color:${this.palette.map('#0000ee','text')}}:where(a:visited){color:${this.palette.map('#551a8b','text')}}input,textarea,select,button{background-color:${background};color:${text};border-color:#526071}::selection{background:#34547b;color:${text}}\n${inlineRules}\n${legacyRules}`);
+    const base=this.makeStyle(root,(root===document?`html{background:${background};color:${text};color-scheme:dark}body{background:${background};color:${text}}`:'')+`:where(a:link){color:${this.palette.map('#0000ee','text')}}:where(a:visited){color:${this.palette.map('#551a8b','text')}}:where(svg){fill:currentColor}input,textarea,select,button{background-color:${background};color:${text};border-color:#526071}::selection{background:#34547b;color:${text}}\n${inlineRules}\n${legacyRules}\n${svgRules}`);
     // Low-priority defaults must precede website rules and their generated twins.
     base.parentNode.insertBefore(base,base.parentNode.firstChild);
     this.generated.add(base.sheet);
     const observer=new MutationObserver(records=>this.mutations(records));
-    observer.observe(root,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['style','href','media','disabled','bgcolor','color','text']});
+    observer.observe(root,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['style','href','media','disabled','bgcolor','color','text','fill','stroke','stop-color']});
     this.roots.set(root,{base,observer});
     for(const source of root.querySelectorAll('style:not([data-lumashift]),link[rel~=stylesheet]'))this.processSheet(source);
     for(const source of [...root.adoptedStyleSheets||[]])if(!this.generated.has(source))this.processSheet(source,root);
@@ -94,7 +101,7 @@ export class ThemeEngine {
   scanOne(node) {
     if(node.hasAttribute(marker))return;
     if(node.matches('style,link[rel~=stylesheet]'))this.processSheet(node);
-    if(node.hasAttribute('style')||node.hasAttribute('bgcolor')||node.matches('font[color],body[text]'))this.processInline(node);
+    if(node.hasAttribute('style')||node.hasAttribute('bgcolor')||node.matches(`font[color],body[text],${svgSelector}`))this.processInline(node);
     if(node.shadowRoot)this.addRoot(node.shadowRoot);
   }
   mutations(records) {
@@ -103,7 +110,7 @@ export class ThemeEngine {
       const node=record.target.nodeType===1?record.target:record.target.parentElement;
       if(node?.hasAttribute(marker))continue;
       if(record.type==='attributes') {
-        if(['style','bgcolor','color','text'].includes(record.attributeName)) {
+        if(['style','bgcolor','color','text',...svgProperties].includes(record.attributeName)) {
           if(touched.has(node))continue;touched.add(node);
           const entry=this.inlines.get(node);
           if(!entry || record.attributeName!=='style' || this.inlineSignature(node)!==entry.signature)this.enqueue(node,'inline');
@@ -123,46 +130,51 @@ export class ThemeEngine {
     return node.getAttribute('style')||'';
   }
   legacySignature(node) {
-    return ['bgcolor','color','text'].map(p=>node.getAttribute(p)||'').join('|');
+    return ['bgcolor','text',...svgProperties].map(p=>node.getAttribute(p)||'').join('|');
   }
-  declarations(style,baseURL) {
-    const parts=[];
-    // Unresolved var() shorthand exposes empty longhands in CSSOM. Read the
-    // shorthand explicitly instead of silently dropping backgrounds/borders.
-    const properties=new Set([...style]);
-    for(const shorthand of variableShorthands)if(style.getPropertyValue(shorthand).includes('var('))properties.add(shorthand);
-    for(const property of properties) {
+  declarations(style,baseURL,source) {
+    const parts=[],shorthands=[];
+    const thin=isThinPaint(style);
+    for(const {property,value,priority:importance} of declarations(style,source)) {
       if(property.startsWith('--luma-'))continue;
-      const value=style.getPropertyValue(property),priority=style.getPropertyPriority(property)?'!important':'';
+      const priority=importance?'!important':'';
       if(property.startsWith('--')) {
         // Duplicate variable declarations per use role, preserving their scope.
         for(const role of roles) {const next=this.palette.variable(value,role);if(next!==value)parts.push(`--luma-${role}-${property.slice(2)}:${next}${priority}`);}
       } else {
-        const role=propertyRole(property);if(!role)continue;
-        let next=this.palette.rewrite(value,role);
-        if(next!==value) {
+        const role=propertyRole(property)==='bg'&&thin?'border':propertyRole(property);
+        const preservesShorthand=shorthands.some(p=>property.startsWith(p+'-'));
+        if(!role && !preservesShorthand)continue;
+        let next=property==='box-shadow'?this.palette.shadow(value):role?this.palette.rewrite(value,role):value;
+        if(next!==value || preservesShorthand) {
           if(baseURL)next=next.replace(/url\(\s*(['"]?)([^)'"\s]+)\1\s*\)/g,(whole,quote,url)=>{try{return `url("${new URL(url,baseURL).href}")`;}catch{return whole;}});
           parts.push(`${property}:${next}${priority}`);
+          if(variableShorthands.includes(property))shorthands.push(property);
         }
       }
     }
     return parts.join(';');
   }
-  rules(rules,depth=0) {
+  rules(rules,depth=0,sources=new Map()) {
     if(depth>12)return '';
     const out=[];
     for(const rule of rules) {
       if(rule.type===CSSRule.STYLE_RULE) {
-        const declaration=this.declarations(rule.style,rule.parentStyleSheet?.href);
-        const nested=rule.cssRules?.length?this.rules(rule.cssRules,depth+1):'';
+        const authored=sources.get(rule.cssText)?.shift();
+        const declaration=this.declarations(rule.style,rule.parentStyleSheet?.href,authored);
+        const nested=rule.cssRules?.length?this.rules(rule.cssRules,depth+1,sources):'';
         if(declaration||nested)out.push(`${rule.selectorText}{${declaration}${nested?';'+nested:''}}`);
       } else if(rule.type===CSSRule.IMPORT_RULE) {
         try {const content=this.rules(rule.styleSheet.cssRules,depth+1);out.push(rule.media.mediaText?`@media ${rule.media.mediaText}{${content}}`:content);} catch {this.failed.add('import');}
       } else if(rule.cssRules && rule.type!==CSSRule.KEYFRAMES_RULE) {
-        const inner=this.rules(rule.cssRules,depth+1);if(inner)out.push(`${rule.cssText.slice(0,rule.cssText.indexOf('{'))}{${inner}}`);
+        const inner=this.rules(rule.cssRules,depth+1,sources);if(inner)out.push(`${rule.cssText.slice(0,rule.cssText.indexOf('{'))}{${inner}}`);
       }
     }
     return out.join('\n');
+  }
+  sources(manager,text='') {
+    if(manager.sourceText!==text){manager.sourceText=text;manager.sources=sourceDeclarations(text);}
+    return new Map([...manager.sources||[]].map(([key,values])=>[key,[...values]]));
   }
   processSheet(source,adoptedRoot) {
     if(!this.active || source.hasAttribute?.(marker) || this.generated.has(source))return;
@@ -193,8 +205,15 @@ export class ThemeEngine {
     const sheet=adopted?source:source.sheet;
     if(!sheet)return;
     ++manager.version;
-    try {const css=this.rules(sheet.cssRules);if(manager.output.textContent!==css)manager.output.textContent=css;this.generated.add(manager.output.sheet);}
-    catch {
+    if(manager.sourceHref!==source.href){manager.sourceHref=source.href;manager.sourceText=undefined;manager.sources=undefined;}
+    try {
+      const css=this.rules(sheet.cssRules,0,this.sources(manager,source.tagName==='STYLE'?source.textContent:manager.sourceText));
+      if(manager.output.textContent!==css)manager.output.textContent=css;this.generated.add(manager.output.sheet);
+      // Same-origin sheets expose CSSOM too, but it still loses partially
+      // overridden var() shorthands. Fetch source only when recovery is needed.
+      if(!source.href || manager.sourceText || !hasPendingColors(sheet.cssRules))return;
+    } catch { /* Cross-origin CSSOM needs the same source fetch below. */ }
+    {
       if(!source.href || manager.fetching)return;
       manager.fetching=true;const epoch=this.epoch;
       const href=source.href;
@@ -205,7 +224,8 @@ export class ThemeEngine {
         // CSSStyleSheet.replaceSync ignores @import; record that boundary.
         if(/@import\b/i.test(text))this.failed.add('cross-origin-import');
         const absolute=text.replace(/url\(\s*(['"]?)([^)'"\s]+)\1\s*\)/g,(whole,quote,url)=>{try{return `url("${new URL(url,source.href).href}")`;}catch{return whole;}});
-        parsed.replaceSync(absolute);manager.output.textContent=this.rules(parsed.cssRules);this.generated.add(manager.output.sheet);
+        parsed.replaceSync(absolute);manager.sourceText=absolute;manager.sources=sourceDeclarations(absolute,parsed.cssRules);
+        manager.output.textContent=this.rules(parsed.cssRules,0,this.sources(manager,absolute));this.generated.add(manager.output.sheet);
       }).catch(()=>this.failed.add('stylesheet')).finally(()=>{manager.fetching=false;});
     }
   }
@@ -216,23 +236,38 @@ export class ThemeEngine {
     // Diff generated declarations in place. Removing/readding every attribute on
     // every mutation multiplies style invalidation on frequently updating pages.
     const tokens=[],important=new Map(),generated=new Map();
+    const protectedSVG=node.namespaceURI==='http://www.w3.org/2000/svg' && node.closest(svgProtected);
+    if(node.namespaceURI==='http://www.w3.org/2000/svg')for(const property of svgProperties) {
+      if(!node.hasAttribute(property))continue;
+      const original=node.getAttribute(property);
+      const mapped=protectedSVG?original:this.palette.rewrite(original,'text');
+      // Even none/currentColor must retain precedence over the SVG default.
+      tokens.push(`svg-${property}`);generated.set(`--luma-svg-${property}`,mapped);
+    }
     const legacy=[['bgcolor','bg'],[node.tagName==='BODY'?'text':node.tagName==='FONT'?'color':'','text']];
     for(const [attribute,role] of legacy)if(attribute && node.hasAttribute(attribute)) {
       let original=node.getAttribute(attribute).trim();if(/^[a-f\d]{3}(?:[a-f\d]{3})?$/i.test(original))original='#'+original;
       const mapped=this.palette.map(original,role);
       if(mapped!==original){tokens.push(`legacy-${role}`);generated.set(`--luma-legacy-${role}`,mapped);}
     }
-    const properties=new Set([...node.style].filter(p=>!old?.generated.has(p)));
-    for(const shorthand of variableShorthands)if(node.style.getPropertyValue(shorthand).includes('var('))properties.add(shorthand);
-    for(const property of properties) {
-      let value=node.style.getPropertyValue(property);
+    const source=old?.signature===this.inlineSignature(node)?old.source:node.getAttribute('style')||'';
+    const pending=[...node.style].some(p=>/^(background|border)/.test(p) && !node.style.getPropertyValue(p));
+    const thin=isThinPaint(node.style);
+    for(const {property,value:raw,priority} of declarations(node.style,pending?source:undefined)) {
+      if(old?.generated.has(property)||property.startsWith('--luma-'))continue;
+      let value=raw;
       const previous=old?.important.get(property);
       if(previous && value===previous.applied && node.style.getPropertyPriority(property)==='important')value=previous.original;
       if(property.startsWith('--')) {
         for(const role of roles) {const next=this.palette.variable(value,role);if(next!==value)generated.set(`--luma-${role}-${property.slice(2)}`,next);}
       } else if(inlineProperties.includes(property)) {
-        const next=this.palette.rewrite(value,propertyRole(property));if(next===value)continue;
-        if(node.style.getPropertyPriority(property)==='important') {
+        if(protectedSVG && svgProperties.includes(property))continue;
+        const role=propertyRole(property)==='bg'&&thin?'border':propertyRole(property);
+        const next=property==='box-shadow'?this.palette.shadow(value):role?this.palette.rewrite(value,role):value;
+        // Preserve trailing longhands when an unresolved shorthand is mapped.
+        const shorthand=variableShorthands.find(p=>property.startsWith(p+'-') && tokens.includes(p));
+        if(next===value && !shorthand)continue;
+        if(priority==='important') {
           if(node.style.getPropertyValue(property)!==next)node.style.setProperty(property,next,'important');important.set(property,{original:value,applied:node.style.getPropertyValue(property)});
         } else {tokens.push(property);generated.set(`--luma-inline-${property}`,next);}
       }
@@ -247,7 +282,7 @@ export class ThemeEngine {
     }
     const attribute=tokens.join(' ');
     if(attribute){if(node.getAttribute(inlineAttribute)!==attribute)node.setAttribute(inlineAttribute,attribute);}else node.removeAttribute(inlineAttribute);
-    if(generated.size||important.size)this.inlines.set(node,{signature:this.inlineSignature(node),legacy:this.legacySignature(node),important,generated,originals});
+    if(generated.size||important.size)this.inlines.set(node,{signature:this.inlineSignature(node),legacy:this.legacySignature(node),source,important,generated,originals});
     else this.inlines.delete(node);
   }
   restoreInline(node,entry) {
@@ -256,6 +291,12 @@ export class ThemeEngine {
     node.removeAttribute(inlineAttribute);
   }
   prune() {
+    // A component commonly sets shadowRoot.innerHTML immediately after
+    // attachShadow(). That removes our freshly inserted base style as well.
+    for(const [root,entry] of this.roots)if(!entry.base.isConnected && (root===document||root.host.isConnected)) {
+      const parent=root===document?document.head||document.documentElement:root;
+      parent.insertBefore(entry.base,parent.firstChild);
+    }
     for(const [source,manager] of this.managers)if(source instanceof CSSStyleSheet?!manager.root.adoptedStyleSheets.includes(source):!source.isConnected) {manager.output.remove();source.removeEventListener?.('load',manager.load);this.managers.delete(source);}
     for(const [node,entry] of this.inlines)if(!node.isConnected){this.restoreInline(node,entry);this.inlines.delete(node);}
     for(const [root,entry] of this.roots)if(root!==document && !root.host.isConnected){entry.observer.disconnect();entry.base.remove();this.roots.delete(root);for(const [source,m] of this.managers)if(m.root===root){m.output.remove();source.removeEventListener?.('load',m.load);this.managers.delete(source);}}

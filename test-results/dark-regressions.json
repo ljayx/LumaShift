@@ -1,0 +1,38 @@
+{
+  "date": "2026-09-24T13:58:02.557Z",
+  "results": [
+    {
+      "name": "SVG attributes, inherited defaults, symbols and gradient stops",
+      "status": "passed"
+    },
+    {
+      "name": "mask/clip geometry and author CSS/hover precedence",
+      "status": "passed"
+    },
+    {
+      "name": "partial variable shorthands, pseudo elements, background layout and media",
+      "status": "passed"
+    },
+    {
+      "name": "translucent borders, logical borders and hard shadow separators",
+      "status": "passed"
+    },
+    {
+      "name": "background-painted ticks and pseudo-element separators",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic SVG attributes, removal, inline priority and Shadow DOM",
+      "status": "passed"
+    },
+    {
+      "name": "disable restores latest site values and removes generated attributes",
+      "status": "passed"
+    },
+    {
+      "name": "reference site stylesheet: card document outer surface",
+      "status": "passed"
+    }
+  ],
+  "errors": []
+}

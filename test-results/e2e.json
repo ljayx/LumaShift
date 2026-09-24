@@ -1,76 +1,76 @@
 {
-  "date": "2026-09-23T03:11:46.433Z",
+  "date": "2026-09-24T13:58:46.993Z",
   "browser": "145.0.7632.6",
   "results": [
     {
       "name": "default activation / CSS layers / semantic colors / CSP",
       "status": "passed",
-      "ms": 627
+      "ms": 569
     },
     {
       "name": "input / focus / scroll / media / clean current-theme restoration",
       "status": "passed",
-      "ms": 36
+      "ms": 33
     },
     {
       "name": "dynamic add/remove / inline change / menu / dialog / SPA",
       "status": "passed",
-      "ms": 612
+      "ms": 633
     },
     {
       "name": "native light → dark → light, manual override, restore current website theme",
       "status": "passed",
-      "ms": 406
+      "ms": 358
     },
     {
       "name": "both iframe origins inherit top-host rule / open Shadow DOM",
       "status": "passed",
-      "ms": 259
+      "ms": 304
     },
     {
       "name": "late open shadow / adopted styles / inline var shorthand / media pixels and playback",
       "status": "passed",
-      "ms": 553
+      "ms": 635
     },
     {
       "name": "all existing related tabs update; unrelated hostname stays independent",
       "status": "passed",
-      "ms": 536
+      "ms": 551
     },
     {
       "name": "CSSOM insertion / custom variables / inline !important restoration",
       "status": "passed",
-      "ms": 338
+      "ms": 282
     },
     {
       "name": "legacy HTML background attributes remain readable and restore current values",
       "status": "passed",
-      "ms": 285
+      "ms": 300
     },
     {
       "name": "embedded PDF does not disable the surrounding HTML page",
       "status": "passed",
-      "ms": 47
+      "ms": 54
     },
     {
       "name": "popup controls / colors / warning / color-only reset / actual status",
       "status": "passed",
-      "ms": 1118
+      "ms": 1092
     },
     {
       "name": "restricted page popup explains unsupported state",
       "status": "passed",
-      "ms": 257
+      "ms": 266
     },
     {
       "name": "100 toggles leave no generated styles and preserve site values",
       "status": "passed",
-      "ms": 1958
+      "ms": 2321
     },
     {
       "name": "browser restart persists colors and exact-host site rule",
       "status": "passed",
-      "ms": 877
+      "ms": 1121
     }
   ],
   "pageErrors": []

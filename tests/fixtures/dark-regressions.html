@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<title>深色模式覆盖回归</title>
+<link rel="stylesheet" href="/dark-regressions.css">
+<style>
+  :root { --surface:#fbfcfd; --line:1px solid rgba(0,0,0,.12); --ink:#11141a; }
+  body { margin:32px; background:#fff; color:#111; font:16px/1.6 sans-serif; }
+  /* An unsupported vendor selector must not shift source/CSSOM matching. */
+  input::-moz-placeholder { color:#111; }
+  section { padding:20px; margin:16px 0; border:1px solid #ddd; }
+  .toolbar { display:flex; align-items:center; gap:20px; }
+  svg { width:24px; height:24px; }
+  .sheet-surface { background:var(--surface); background-position:100% 100%; background-repeat:no-repeat; background-size:cover; }
+  .pseudo::before { content:'伪元素背景'; display:block; background:var(--surface); background-size:cover; padding:8px; }
+  .sheet-border { border:var(--line); border-radius:8px; border-left-width:3px; }
+  .logical-border { border-inline-start:1px solid rgba(0,0,0,.12); }
+  .hover-icon path { fill:#123; }
+  .hover-icon:hover path { fill:#c22; }
+  .css-none path { fill:none; stroke:#123; }
+  .hard-edge { box-shadow:0 1px 0 rgba(0,0,0,.12),0 4px 12px rgba(0,0,0,.2); }
+  .clear-border { border:1px solid transparent; }
+  .painted-line { height:2px; width:100%; background-color:#11141a33; }
+  .painted-pseudo::after { content:''; display:block; height:2px; background:var(--ink); }
+  .image { width:100px; height:30px; background:var(--surface); background-image:url('/media.svg'); background-size:contain; background-repeat:no-repeat; }
+</style>
+<h1>图标、线条与背景覆盖</h1>
+<section class="toolbar">
+  <svg id="stroke-icon" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="4" height="4" stroke="#11141a"/><rect x="8" y="4" width="6" height="1" fill="#11141a"/></svg>
+  <svg id="masked-icon" viewBox="0 0 16 16" fill="none"><mask id="mask" style="mask-type:alpha"><rect width="16" height="16" fill="#000"/></mask><g mask="url(#mask)"><path d="M7 2h2v5h5v2H9v5H7V9H2V7h5z" fill="#11141a"/></g></svg>
+  <svg id="default-icon" viewBox="0 0 16 16"><path d="M7 2h2v5h5v2H9v5H7V9H2V7h5z"/></svg>
+  <svg class="hover-icon" viewBox="0 0 16 16"><path fill="#000" d="M2 2h12v12H2z"/></svg>
+  <svg class="css-none" viewBox="0 0 16 16"><path fill="#000" d="M2 2h12v12H2z"/></svg>
+  <svg id="gradient-icon" viewBox="0 0 16 16"><defs><linearGradient id="gradient"><stop stop-color="#111"/><stop offset="1" stop-color="#444"/></linearGradient><symbol id="symbol"><path fill="#222" d="M2 2h12v12H2z"/></symbol></defs><path fill="url(#gradient)" d="M2 2h12v12H2z"/></svg>
+  <svg id="use-icon" viewBox="0 0 16 16"><use href="#symbol"/></svg>
+  <svg id="protected" viewBox="0 0 16 16"><defs><mask id="luminance-mask"><rect width="16" height="16" fill="white"/><path fill="black" d="M2 2h6v6H2z"/></mask><clipPath id="clip"><path fill="#000" d="M0 0h16v16H0z"/></clipPath></defs><path fill="#222" mask="url(#luminance-mask)" d="M0 0h16v16H0z"/></svg>
+</section>
+<section class="sheet-surface">变量背景 + 后续定位、重复、尺寸声明</section>
+<section class="external-surface">外部样式表中的变量背景</section>
+<section class="pseudo">伪元素</section>
+<section id="inline-surface" style="background:var(--surface);background-position:100% 100%;background-repeat:no-repeat;background-size:cover">行内变量背景</section>
+<section class="sheet-border">半透明边框 + 覆盖左边宽度</section>
+<section id="inline-border" style="border:var(--line);border-left-width:3px">行内边框</section>
+<section class="logical-border">逻辑方向边框</section>
+<section class="hard-edge">实线阴影分隔与柔和投影</section>
+<section class="painted-pseudo">背景色绘制的刻度与伪元素分隔线<div class="painted-line"></div><div id="inline-line" style="height:2px;background:#11141a33;margin:10px 0"></div></section>
+<section class="clear-border">透明占位边框</section>
+<div class="image"></div>
+<div id="shadow-host"></div>
+</html>

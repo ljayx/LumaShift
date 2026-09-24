@@ -40,6 +40,7 @@ macOS/Linux 安装独立测试浏览器并运行自动化：
 ```bash
 PLAYWRIGHT_BROWSERS_PATH=.cache/browsers npx playwright install chromium
 PLAYWRIGHT_BROWSERS_PATH=.cache/browsers npm run test:e2e
+PLAYWRIGHT_BROWSERS_PATH=.cache/browsers npm run test:dark
 PLAYWRIGHT_BROWSERS_PATH=.cache/browsers npm run test:perf
 PLAYWRIGHT_BROWSERS_PATH=.cache/browsers npm run test:paired
 PLAYWRIGHT_BROWSERS_PATH=.cache/browsers npm run test:sites
@@ -61,6 +62,7 @@ npm run report
 - docs/performance-budget.md：测试前固定的性能预算。
 - docs/test-report.md：实际结果、缺口和已知问题。
 - docs/test-matrix.md：人工复现与验收步骤。
+- docs/dark-mode-review.md：图标、边框与局部背景覆盖修复及回归记录。
 - src/：扩展源码；dist/：可安装构建。
 - tests/fixtures/：可控回归页面；scripts/：构建和测试脚本。
 - test-results/：机器可读原始数据与实际截图。

@@ -1,4 +1,5 @@
 import {luminance} from './settings.js';
+import {splitCSS} from './declarations.js';
 
 const clamp=(n,a=0,b=1)=>Math.max(a,Math.min(b,n));
 export function toHSL([r,g,b]) {
@@ -53,7 +54,14 @@ export function createPalette(background,text,parseFallback=()=>null) {
       }
     } else if(role==='border') out=neutral?fromHSL([bh,bs*0.6,clamp(bl+0.17+(1-l)*0.08)]):fromHSL([h,s*0.8,clamp(l,0.35,0.6)]);
     else out=[0,0,0];
-    const alpha=role==='shadow'?Math.min(color[3],0.55):color[3];
+    let alpha=role==='shadow'?Math.min(color[3],0.55):color[3];
+    // A faint dark border on white loses almost all contrast when both its
+    // RGB channels and the surface become dark. Use a lighter translucent ink;
+    // fully transparent borders (layout placeholders) returned above stay clear.
+    if(role==='border' && alpha<1 && luminance(fg)>luminance(bg)) {
+      out=out.map((v,i)=>Math.round(v*alpha+fg[i]*(1-alpha)));
+      alpha=Math.max(alpha,0.24);
+    }
     const result=alpha<1?`rgba(${out.join(', ')}, ${+alpha.toFixed(3)})`:`rgb(${out.join(', ')})`;
     cache.set(key,result);if(cache.size>2048)cache.delete(cache.keys().next().value);
     return result;
@@ -104,11 +112,18 @@ export function createPalette(background,text,parseFallback=()=>null) {
     }
     return rewrite(value,role);
   };
-  return {map,rewrite,variable};
+  const shadow=value=>splitCSS(value,',').map(part=>{
+    // Zero-blur shadows are commonly separators or focus rings. Keep soft
+    // elevation shadows dark, but map these hard edges like borders.
+    const lengths=part.replace(/(?:rgba?|hsla?|var|calc)\([^)]*\)/gi,'').match(/(?<![\w#.-])-?(?:\d*\.)?\d+(?:px|em|rem)?(?![\w.-])/g)||[];
+    const edge=lengths.length>=2 && (lengths.length===2 || parseFloat(lengths[2])===0);
+    return rewrite(part,edge?'border':'shadow');
+  }).join(',');
+  return {map,rewrite,variable,shadow};
 }
 
 export function propertyRole(property) {
-  if(property==='color'||property==='fill'||property==='stroke'||property==='caret-color'||property==='text-decoration-color'||property==='-webkit-text-fill-color')return 'text';
+  if(property==='color'||property==='fill'||property==='stroke'||property==='stop-color'||property==='caret-color'||property==='text-decoration-color'||property==='-webkit-text-fill-color')return 'text';
   if(property==='background'||property==='background-color'||property==='background-image')return 'bg';
   if(property==='box-shadow'||property==='text-shadow')return 'shadow';
   if(/^(border|outline)(-(top|right|bottom|left|block|inline)(-(start|end))?)?(-color)?$/.test(property))return 'border';

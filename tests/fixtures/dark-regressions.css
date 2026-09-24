@@ -1,0 +1,4 @@
+input::-moz-placeholder { color:#111; }
+@media (min-width:1px) {
+  .external-surface { background:var(--surface); background-position:100% 100%; background-size:cover; }
+}

@@ -27,3 +27,11 @@ test('RGB channel variables and variable alpha are not mistaken for black',()=>{
   assert.equal(palette.rewrite('rgb(var(--channels) / .5)','bg'),'rgb(var(--luma-bg-channels, var(--channels)) / .5)');
   assert.equal(palette.rewrite('rgb(255 255 255 / var(--alpha))','bg'),'rgba(24, 28, 36, var(--alpha))');
 });
+test('faint borders remain visible while transparent spacers and soft shadows stay intact',()=>{
+  const border=parseSimple(palette.map('rgba(0,0,0,.12)','border'));
+  assert.ok(border[0]>150 && border[3]>=.24);
+  assert.equal(palette.map('rgba(0,0,0,0)','border'),'rgba(0,0,0,0)');
+  const shadows=palette.shadow('0 1px 0 rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.2)');
+  assert.ok(!shadows.startsWith('0 1px 0 rgba(0, 0, 0,'));
+  assert.match(shadows,/0 4px 12px rgba\(0, 0, 0, 0.2\)/);
+});

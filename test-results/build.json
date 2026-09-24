@@ -1,7 +1,8 @@
 {
-  "date": "2026-09-23T03:11:30.227Z",
+  "date": "2026-09-24T13:57:51.075Z",
   "inputs": [
     "src/settings.js",
+    "src/declarations.js",
     "src/colors.js",
     "src/engine.js",
     "src/detection.js",
@@ -11,7 +12,7 @@
     "src/popup.js"
   ],
   "outputs": {
-    "dist/content.js": 21075,
+    "dist/content.js": 25965,
     "dist/background.js": 4685,
     "dist/proxy.js": 1339,
     "dist/popup.js": 3942
