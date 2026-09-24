@@ -13,6 +13,41 @@ function background(element) {
   return color.map(v=>v+255*(1-alpha));
 }
 
+function pageSurface(x,y,layers) {
+  const layerFor=node=>{
+    if(layers.has(node))return layers.get(node);
+    let layer=null;
+    if(node && node!==document.body && node!==document.documentElement) {
+      layer=layerFor(node.parentElement);
+      if(!layer) {
+        const style=getComputedStyle(node);
+        const modal=node.matches('dialog[open],[aria-modal="true"],[role="dialog"],[role="alertdialog"],:popover-open');
+        if(modal || style.position==='fixed' || (style.position==='absolute' && Number(style.zIndex)>0)) {
+          const alpha=rgba(style.backgroundColor)[3];
+          layer={root:node,modal,translucent:alpha>0 && alpha<1};
+        }
+      }
+    }
+    layers.set(node,layer);return layer;
+  };
+  const stack=document.elementsFromPoint(x,y);
+  for(const node of stack) {
+    const layer=layerFor(node);
+    if(layer) {
+      // Search panels and their backdrops are not the website's theme. Read
+      // the content beneath them, without hiding or mutating the overlay.
+      if(layer.modal || layer.translucent)continue;
+      const underlay=stack.some(other=>other!==document.body && other!==document.documentElement &&
+        !layer.root.contains(other) && !other.contains(layer.root) && !layerFor(other));
+      if(underlay)continue;
+      // A fixed application shell with no content behind it is still a page
+      // surface; do not assume every positioned container is a popup.
+    }
+    return node;
+  }
+  return document.body||document.documentElement;
+}
+
 // No paint can occur between disabling and restoring the sheets in this task.
 // Current website CSS remains the source of truth, including changes made while on.
 export function inspectOriginal(previous=false) {
@@ -21,9 +56,9 @@ export function inspectOriginal(previous=false) {
   enabled.forEach(s=>{s.disabled=true;});
   try {
     const targets=new Set([document.documentElement,document.body].filter(Boolean));
-    const levels=[];
+    const levels=[],layers=new Map();
     for(const x of [0.2,0.5,0.8]) for(const y of [0.2,0.5,0.8]) {
-      let node=document.elementFromPoint(innerWidth*x,innerHeight*y);
+      let node=pageSurface(innerWidth*x,innerHeight*y,layers);
       if(!node)continue;
       if(node.closest('img,video,canvas,svg,iframe')) node=node.parentElement;
       if(!node)continue;

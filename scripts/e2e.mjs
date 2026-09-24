@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import {mkdir,writeFile,rm} from 'node:fs/promises';
 import {serve} from './serve.mjs';
-import {launch,settings,waitStatus,background,settle} from './browser.mjs';
+import {launch,settings,waitStatus,getStatus,background,settle} from './browser.mjs';
 const server=await serve();
 let browser=await launch();
 let {context,worker}=browser;
@@ -44,6 +44,58 @@ try {
     await settings(worker,{enabled:false});await waitStatus(worker,page,'off');assert.equal(await background(page),'rgb(22, 28, 37)');
     await settings(worker,{enabled:true,'site:localhost':'auto'});await waitStatus(worker,page,'native');
     await page.locator('#native').click();await waitStatus(worker,page,'active');
+  });
+  await test('Ctrl+G search overlay preserves page theme and native theme changes',async()=>{
+    const search=await context.newPage();
+    try {
+      await search.goto('http://localhost:4173/?search-overlay');await waitStatus(worker,search,'active');
+      await search.evaluate(()=>{
+        document.addEventListener('keydown',event=>{
+          if(event.ctrlKey && event.key.toLowerCase()==='g') {
+            event.preventDefault();
+            const overlay=document.createElement('div');overlay.id='search-overlay';
+            overlay.style.cssText='position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.75)';
+            overlay.innerHTML='<input aria-label="Search" placeholder="Search">';
+            document.body.append(overlay);overlay.querySelector('input').focus();
+          } else if(event.key==='Escape')document.querySelector('#search-overlay')?.remove();
+        });
+      });
+      const converted=await background(search);
+      for(let i=0;i<2;i++) {
+        await search.keyboard.press('Control+g');await search.waitForTimeout(400);
+        assert.equal((await getStatus(worker,search)).status,'active');
+        assert.equal(await background(search),converted);
+        await search.getByRole('textbox',{name:'Search',exact:true}).fill('keep focus');
+        assert.equal(await search.evaluate(()=>document.activeElement.value),'keep focus');
+        await search.keyboard.press('Escape');await search.waitForTimeout(250);
+        assert.equal((await getStatus(worker,search)).status,'active');
+      }
+      await search.keyboard.press('Control+g');
+      // Opaque extension panels can use either fixed or absolute positioning.
+      for(const position of ['fixed','absolute']) {
+        await search.locator('#search-overlay').evaluate((n,position)=>{n.style.position=position;n.style.background='#111';window.dispatchEvent(new Event('resize'));},position);
+        await search.waitForTimeout(400);
+        assert.equal((await getStatus(worker,search)).status,'active');assert.equal(await background(search),converted);
+      }
+      await search.evaluate(()=>document.documentElement.dataset.theme='dark');
+      await waitStatus(worker,search,'native');
+      // A light modal must not cause an already dark site to start converting.
+      await search.locator('#search-overlay').evaluate(n=>{n.setAttribute('role','dialog');n.setAttribute('aria-modal','true');n.style.background='#fff';window.dispatchEvent(new Event('resize'));});
+      await search.waitForTimeout(400);assert.equal((await getStatus(worker,search)).status,'native');
+      await search.evaluate(()=>document.documentElement.dataset.theme='light');
+      await waitStatus(worker,search,'active');assert.equal(await background(search),converted);
+      await search.keyboard.press('Escape');await search.waitForTimeout(250);
+      assert.equal((await getStatus(worker,search)).status,'active');
+      // Full-page fixed layouts must still participate in native detection.
+      await search.evaluate(()=>{
+        const shell=document.createElement('main');shell.id='fixed-app';
+        shell.style.cssText='position:fixed;inset:0;background:#151515;color:#eee';
+        shell.textContent='Application';document.body.replaceChildren(shell);
+      });
+      await waitStatus(worker,search,'native');
+      await search.locator('#fixed-app').evaluate(n=>n.style.background='#fff');
+      await waitStatus(worker,search,'active');
+    } finally {await search.close();}
   });
   await test('both iframe origins inherit top-host rule / open Shadow DOM',async()=>{
     assert.equal(page.frames().length,3);

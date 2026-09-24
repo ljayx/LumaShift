@@ -1,5 +1,5 @@
 {
-  "date": "2026-09-24T13:57:51.075Z",
+  "date": "2026-09-24T14:04:43.335Z",
   "inputs": [
     "src/settings.js",
     "src/declarations.js",
@@ -12,7 +12,7 @@
     "src/popup.js"
   ],
   "outputs": {
-    "dist/content.js": 25965,
+    "dist/content.js": 26655,
     "dist/background.js": 4685,
     "dist/proxy.js": 1339,
     "dist/popup.js": 3942

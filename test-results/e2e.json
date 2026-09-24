@@ -1,76 +1,81 @@
 {
-  "date": "2026-09-24T13:58:46.993Z",
+  "date": "2026-09-24T14:05:36.848Z",
   "browser": "145.0.7632.6",
   "results": [
     {
       "name": "default activation / CSS layers / semantic colors / CSP",
       "status": "passed",
-      "ms": 569
+      "ms": 716
     },
     {
       "name": "input / focus / scroll / media / clean current-theme restoration",
       "status": "passed",
-      "ms": 33
+      "ms": 39
     },
     {
       "name": "dynamic add/remove / inline change / menu / dialog / SPA",
       "status": "passed",
-      "ms": 633
+      "ms": 572
     },
     {
       "name": "native light → dark → light, manual override, restore current website theme",
       "status": "passed",
-      "ms": 358
+      "ms": 426
+    },
+    {
+      "name": "Ctrl+G search overlay preserves page theme and native theme changes",
+      "status": "passed",
+      "ms": 3820
     },
     {
       "name": "both iframe origins inherit top-host rule / open Shadow DOM",
       "status": "passed",
-      "ms": 304
+      "ms": 294
     },
     {
       "name": "late open shadow / adopted styles / inline var shorthand / media pixels and playback",
       "status": "passed",
-      "ms": 635
+      "ms": 564
     },
     {
       "name": "all existing related tabs update; unrelated hostname stays independent",
       "status": "passed",
-      "ms": 551
+      "ms": 506
     },
     {
       "name": "CSSOM insertion / custom variables / inline !important restoration",
       "status": "passed",
-      "ms": 282
+      "ms": 291
     },
     {
       "name": "legacy HTML background attributes remain readable and restore current values",
       "status": "passed",
-      "ms": 300
+      "ms": 286
     },
     {
       "name": "embedded PDF does not disable the surrounding HTML page",
       "status": "passed",
-      "ms": 54
+      "ms": 68
     },
     {
       "name": "popup controls / colors / warning / color-only reset / actual status",
       "status": "passed",
-      "ms": 1092
+      "ms": 1105
     },
     {
       "name": "restricted page popup explains unsupported state",
       "status": "passed",
-      "ms": 266
+      "ms": 268
     },
     {
       "name": "100 toggles leave no generated styles and preserve site values",
       "status": "passed",
-      "ms": 2321
+      "ms": 1694
     },
     {
       "name": "browser restart persists colors and exact-host site rule",
       "status": "passed",
-      "ms": 1121
+      "ms": 1065
     }
   ],
   "pageErrors": []
