@@ -1,0 +1,188 @@
+{
+  "date": "2026-09-23T02:48:50.197Z",
+  "browser": "145.0.7632.6",
+  "results": [
+    {
+      "id": "github",
+      "url": "https://github.com/darkreader/darkreader",
+      "kind": "开发者 / 代码",
+      "selector": "main",
+      "initialTheme": "browser light preference; original page colors captured",
+      "status": "smoke-tested",
+      "steps": [
+        "Original page visible and screenshot captured",
+        "Automatic conversion status and screenshot captured",
+        "Force conversion and scroll 550px",
+        "Disabled and confirmed off state without reload"
+      ],
+      "pageErrors": [],
+      "httpStatus": 200,
+      "title": "GitHub - darkreader/darkreader: Dark Reader Chrome and Firefox extension · GitHub",
+      "finalURL": "https://github.com/darkreader/darkreader",
+      "automaticStatus": {
+        "status": "active",
+        "reason": "",
+        "host": "github.com",
+        "mode": "auto"
+      },
+      "reason": "Only listed operations; requires visual review. Native website theme switching, login workflows and real video playback not verified."
+    },
+    {
+      "id": "mdn",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/CSS",
+      "kind": "文档",
+      "selector": "main",
+      "initialTheme": "browser light preference; original page colors captured",
+      "status": "smoke-tested",
+      "steps": [
+        "Original page visible and screenshot captured",
+        "Automatic conversion status and screenshot captured",
+        "Force conversion and scroll 550px",
+        "Toggled document details",
+        "Disabled and confirmed off state without reload"
+      ],
+      "pageErrors": [],
+      "httpStatus": 200,
+      "title": "CSS: Cascading Style Sheets | MDN",
+      "finalURL": "https://developer.mozilla.org/en-US/docs/Web/CSS",
+      "automaticStatus": {
+        "status": "active",
+        "reason": "",
+        "host": "developer.mozilla.org",
+        "mode": "auto"
+      },
+      "reason": "Only listed operations; requires visual review. Native website theme switching, login workflows and real video playback not verified."
+    },
+    {
+      "id": "baidu",
+      "url": "https://www.baidu.com/s?wd=Chrome",
+      "kind": "搜索",
+      "selector": "#content_left",
+      "initialTheme": "browser light preference; original page colors captured",
+      "status": "smoke-tested",
+      "steps": [
+        "Original page visible and screenshot captured",
+        "Automatic conversion status and screenshot captured",
+        "Force conversion and scroll 550px",
+        "Disabled and confirmed off state without reload"
+      ],
+      "pageErrors": [],
+      "httpStatus": 200,
+      "title": "Chrome_百度搜索",
+      "finalURL": "https://www.baidu.com/s?wd=Chrome",
+      "automaticStatus": {
+        "status": "active",
+        "reason": "",
+        "host": "www.baidu.com",
+        "mode": "auto"
+      },
+      "reason": "Only listed operations; requires visual review. Native website theme switching, login workflows and real video playback not verified."
+    },
+    {
+      "id": "bilibili",
+      "url": "https://www.bilibili.com/",
+      "kind": "视频入口",
+      "selector": "body",
+      "initialTheme": "browser light preference; original page colors captured",
+      "status": "smoke-tested",
+      "steps": [
+        "Original page visible and screenshot captured",
+        "Automatic conversion status and screenshot captured",
+        "Force conversion and scroll 550px",
+        "Disabled and confirmed off state without reload"
+      ],
+      "pageErrors": [],
+      "httpStatus": 200,
+      "title": "哔哩哔哩 (゜-゜)つロ 干杯~-bilibili",
+      "finalURL": "https://www.bilibili.com/",
+      "automaticStatus": {
+        "status": "active",
+        "reason": "",
+        "host": "www.bilibili.com",
+        "mode": "auto"
+      },
+      "reason": "Only listed operations; requires visual review. Native website theme switching, login workflows and real video playback not verified."
+    },
+    {
+      "id": "zhihu",
+      "url": "https://www.zhihu.com/topic/19550901/hot",
+      "kind": "社区 / 登录边界",
+      "selector": "body",
+      "initialTheme": "browser light preference; original page colors captured",
+      "status": "blocked",
+      "steps": [],
+      "pageErrors": [],
+      "httpStatus": 403,
+      "title": "安全验证 - 知乎",
+      "finalURL": "https://www.zhihu.com/account/unhuman?type=U4E3Z1&need_login=true&session=72789896eec9d1d8d043fab8b8f4dbe8&next=%2Fsignin",
+      "reason": "HTTP error or verification wall; not counted as website compatibility pass"
+    },
+    {
+      "id": "wikipedia",
+      "url": "https://en.wikipedia.org/wiki/Web_browser",
+      "kind": "Wiki / 内容",
+      "selector": "#firstHeading",
+      "initialTheme": "browser light preference; original page colors captured",
+      "status": "smoke-tested",
+      "steps": [
+        "Original page visible and screenshot captured",
+        "Automatic conversion status and screenshot captured",
+        "Force conversion and scroll 550px",
+        "Native Dark → auto skip; native Light → conversion; force on native Dark",
+        "Disabled and confirmed off state without reload"
+      ],
+      "pageErrors": [],
+      "httpStatus": 200,
+      "title": "Web browser - Wikipedia",
+      "finalURL": "https://en.wikipedia.org/wiki/Web_browser",
+      "automaticStatus": {
+        "status": "active",
+        "reason": "",
+        "host": "en.wikipedia.org",
+        "mode": "auto"
+      },
+      "nativeTheme": "verified",
+      "reason": "Only listed operations; native website theme switching verified. Login workflows and real video playback not verified."
+    },
+    {
+      "id": "hn",
+      "url": "https://news.ycombinator.com/",
+      "kind": "新闻 / 社区",
+      "selector": ".titleline",
+      "initialTheme": "browser light preference; original page colors captured",
+      "status": "smoke-tested",
+      "steps": [
+        "Original page visible and screenshot captured",
+        "Automatic conversion status and screenshot captured",
+        "Force conversion and scroll 550px",
+        "Opened public comments page",
+        "Disabled and confirmed off state without reload"
+      ],
+      "pageErrors": [],
+      "httpStatus": 200,
+      "title": "Hacker News",
+      "finalURL": "https://news.ycombinator.com/",
+      "automaticStatus": {
+        "status": "active",
+        "reason": "",
+        "host": "news.ycombinator.com",
+        "mode": "auto"
+      },
+      "reason": "Only listed operations; requires visual review. Native website theme switching, login workflows and real video playback not verified."
+    },
+    {
+      "id": "reddit",
+      "url": "https://www.reddit.com/r/webdev/",
+      "kind": "社区 / 动态列表",
+      "selector": "main",
+      "initialTheme": "browser light preference; original page colors captured",
+      "status": "blocked",
+      "steps": [],
+      "pageErrors": [],
+      "httpStatus": 200,
+      "title": "Reddit - Prove your humanity",
+      "finalURL": "https://www.reddit.com/r/webdev/",
+      "reason": "HTTP error or verification wall; not counted as website compatibility pass"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+
+> lumashift@0.1.0 test
+> node --test tests/unit/*.test.mjs
+
+✔ CSS rewriting preserves URLs and distinguishes variable roles (1.067459ms)
+✔ color parser preserves alpha and HSL round trips (0.411667ms)
+✔ neutral backgrounds retain hierarchy and semantic hues remain distinct (0.767292ms)
+✔ chosen white and black background endpoints are respected (0.247625ms)
+✔ RGB channel variables and variable alpha are not mistaken for black (0.485042ms)
+✔ rule precedence and native theme manual override (0.411625ms)
+✔ host rules separate subdomains and ignore paths / ports (0.187334ms)
+✔ restricted pages and malformed values (0.416333ms)
+✔ contrast ratios use relative luminance (0.153458ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 61.7995

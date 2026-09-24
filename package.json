@@ -1,0 +1,20 @@
+{
+  "name": "lumashift",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local-first adaptive dark themes for Chrome",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/unit/*.test.mjs",
+    "test:e2e": "node scripts/e2e.mjs",
+    "test:perf": "node scripts/performance.mjs",
+    "test:paired": "node scripts/paired-performance.mjs",
+    "test:sites": "node scripts/real-sites.mjs",
+    "report": "node scripts/report.mjs",
+    "prototype": "node scripts/prototype.mjs",
+    "serve": "node scripts/serve.mjs"
+  },
+  "devDependencies": { "darkreader": "4.9.132", "esbuild": "0.25.12", "playwright": "1.58.2" },
+  "engines": { "node": ">=22" }
+}

@@ -1,0 +1,77 @@
+{
+  "date": "2026-09-23T03:11:46.433Z",
+  "browser": "145.0.7632.6",
+  "results": [
+    {
+      "name": "default activation / CSS layers / semantic colors / CSP",
+      "status": "passed",
+      "ms": 627
+    },
+    {
+      "name": "input / focus / scroll / media / clean current-theme restoration",
+      "status": "passed",
+      "ms": 36
+    },
+    {
+      "name": "dynamic add/remove / inline change / menu / dialog / SPA",
+      "status": "passed",
+      "ms": 612
+    },
+    {
+      "name": "native light → dark → light, manual override, restore current website theme",
+      "status": "passed",
+      "ms": 406
+    },
+    {
+      "name": "both iframe origins inherit top-host rule / open Shadow DOM",
+      "status": "passed",
+      "ms": 259
+    },
+    {
+      "name": "late open shadow / adopted styles / inline var shorthand / media pixels and playback",
+      "status": "passed",
+      "ms": 553
+    },
+    {
+      "name": "all existing related tabs update; unrelated hostname stays independent",
+      "status": "passed",
+      "ms": 536
+    },
+    {
+      "name": "CSSOM insertion / custom variables / inline !important restoration",
+      "status": "passed",
+      "ms": 338
+    },
+    {
+      "name": "legacy HTML background attributes remain readable and restore current values",
+      "status": "passed",
+      "ms": 285
+    },
+    {
+      "name": "embedded PDF does not disable the surrounding HTML page",
+      "status": "passed",
+      "ms": 47
+    },
+    {
+      "name": "popup controls / colors / warning / color-only reset / actual status",
+      "status": "passed",
+      "ms": 1118
+    },
+    {
+      "name": "restricted page popup explains unsupported state",
+      "status": "passed",
+      "ms": 257
+    },
+    {
+      "name": "100 toggles leave no generated styles and preserve site values",
+      "status": "passed",
+      "ms": 1958
+    },
+    {
+      "name": "browser restart persists colors and exact-host site rule",
+      "status": "passed",
+      "ms": 877
+    }
+  ],
+  "pageErrors": []
+}

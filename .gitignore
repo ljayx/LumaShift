@@ -1,0 +1,17 @@
+# Dependencies and generated builds
+node_modules/
+dist/
+
+# Local caches and temporary test profiles
+.cache/
+.test-profiles/
+test-results/tmp/
+
+# Local configuration and logs
+.env
+.env.*
+!.env.example
+*.log
+
+# macOS metadata
+.DS_Store

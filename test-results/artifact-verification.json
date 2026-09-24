@@ -1,0 +1,48 @@
+{
+  "requirementsIdenticalToAttachment": true,
+  "requirementsSHA256": "966938aeb0697c65deb6eed37925dddb89eea38ee7c28dec690c85d8b1326297",
+  "distFiles": {
+    "THIRD_PARTY_NOTICES.txt": {
+      "bytes": 191,
+      "sha256": "c0ce49e31bf32517af9b856cf6ba3b81df4207a3b1b2ea62832d28969cff5775"
+    },
+    "background.js": {
+      "bytes": 4685,
+      "sha256": "8ac080f1ae631cac635711fdb0b2aac9273bd73635e09054e1f7f12fc9bba9bc"
+    },
+    "content.js": {
+      "bytes": 21075,
+      "sha256": "25f7d0aef3fb80322f2f2755eeea8ff90f8fa5a40b8c5849bd7ac9ed31205fb0"
+    },
+    "manifest.json": {
+      "bytes": 1112,
+      "sha256": "30a089bba805ba1bafe0912f2204752f16d50257a9c5675f32e467c8b2190dc6"
+    },
+    "popup.css": {
+      "bytes": 4627,
+      "sha256": "87b176575b21ce6407f3537c4e68ef577260b367ffba47380e66defcc2616244"
+    },
+    "popup.html": {
+      "bytes": 2324,
+      "sha256": "325c1c9c00e4c117156b691a85064ca41f8752b935fba26055b19e70d7757b2e"
+    },
+    "popup.js": {
+      "bytes": 3942,
+      "sha256": "ce6b27a2c10ef2c7c53cf429cd491bb895546995926bc03096916c4529fe305f"
+    },
+    "proxy.js": {
+      "bytes": 1339,
+      "sha256": "4b889274e75c64063fe5dec1ad55aa56fcfaede285aac15b5e13165967545e5e"
+    }
+  },
+  "productionBundleInputs": [
+    "src/settings.js",
+    "src/colors.js",
+    "src/engine.js",
+    "src/detection.js",
+    "src/content.js",
+    "src/background.js",
+    "src/proxy.js",
+    "src/popup.js"
+  ]
+}
