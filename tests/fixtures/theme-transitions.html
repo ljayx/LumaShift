@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head><meta charset="utf-8"><title>Theme transition regression</title>
+<style id="theme-styles">
+html,body{margin:0;background:#fff;color:#111}
+main{min-height:100vh;background:#fff;transition:all .2s}
+html[data-theme=dark],html[data-theme=dark] body,html[data-theme=dark] main{background:#161c25;color:#dce3ee}
+</style></head>
+<body><main><h1>Transitioning application surface</h1>
+<button id="native" onclick="document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark'">Website theme</button>
+<button id="update" onclick="document.querySelector('#theme-styles').append(document.createTextNode('/* style update */'))">Update styles</button>
+</main></body></html>

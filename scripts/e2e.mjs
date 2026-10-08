@@ -45,6 +45,37 @@ try {
     await settings(worker,{enabled:true,'site:localhost':'auto'});await waitStatus(worker,page,'native');
     await page.locator('#native').click();await waitStatus(worker,page,'active');
   });
+  await test('background transitions do not oscillate auto mode during style updates',async()=>{
+    const surface=await context.newPage();
+    try {
+      await surface.goto('http://localhost:4173/theme-transitions.html');
+      await waitStatus(worker,surface,'active');await surface.waitForTimeout(350);
+      const result=await surface.evaluate(()=>new Promise(resolve=>{
+        const colors=[],events=[];
+        const listener=e=>events.push(e.type);
+        for(const name of ['__lumashift_start','__lumashift_stop'])document.addEventListener(name,listener);
+        const tick=setInterval(()=>document.querySelector('#update').click(),240);
+        const sample=setInterval(()=>colors.push(getComputedStyle(document.querySelector('main')).backgroundColor),25);
+        setTimeout(()=>{
+          clearInterval(tick);clearInterval(sample);
+          for(const name of ['__lumashift_start','__lumashift_stop'])document.removeEventListener(name,listener);
+          resolve({colors,events});
+        },2400);
+      }));
+      assert.deepEqual(result.events,[],'original-theme sampling must not restart the engine');
+      assert.ok(result.colors.length>20);
+      assert.deepEqual([...new Set(result.colors)],['rgb(24, 28, 36)'],'no intermediate light frames');
+      assert.equal((await getStatus(worker,surface)).status,'active');
+      await surface.locator('#native').click();await waitStatus(worker,surface,'native');
+      await surface.waitForTimeout(350);
+      assert.equal(await surface.locator('main').evaluate(n=>getComputedStyle(n).backgroundColor),'rgb(22, 28, 37)');
+      await surface.locator('#native').click();await waitStatus(worker,surface,'active');
+      await settings(worker,{enabled:false});await waitStatus(worker,surface,'off');await surface.waitForTimeout(350);
+      assert.equal(await surface.locator('main').evaluate(n=>getComputedStyle(n).backgroundColor),'rgb(255, 255, 255)');
+      assert.equal(await surface.locator('main').evaluate(n=>getComputedStyle(n).transitionDuration),'0.2s');
+      assert.equal(await surface.locator('style[data-lumashift]').count(),0);
+    } finally {await surface.close();await settings(worker,{enabled:true});await waitStatus(worker,page,'active');}
+  });
   await test('Ctrl+G search overlay preserves page theme and native theme changes',async()=>{
     const search=await context.newPage();
     try {

@@ -304,11 +304,26 @@ export class ThemeEngine {
     this.generated=new Set([...this.roots.values()].map(e=>e.base.sheet).concat([...this.managers.values()].map(e=>e.output.sheet)).filter(Boolean));
   }
   withOriginal(callback) {
+    if(!this.active)return callback();
     const sheets=[...this.generated].filter(s=>!s.disabled);
+    // Disabling our sheets can start a site's CSS color transitions. Reading
+    // computed styles then sees the old converted dark color, not the original
+    // light endpoint, and auto mode disables/re-enables itself indefinitely.
+    // Keep this guard out of generated: it must remain enabled during sampling.
+    const guards=[...this.roots.keys()].map(root=>this.makeStyle(root,'*,*::before,*::after{transition:none!important}'));
     const important=[];
-    for(const [node,entry] of this.inlines)for(const [prop,value] of entry.important)if(node.style.getPropertyValue(prop)===value.applied && node.style.getPropertyPriority(prop)==='important'){important.push([node,prop,value]);node.style.setProperty(prop,value.original,'important');}
-    sheets.forEach(s=>{s.disabled=true;});
-    try{return callback();}finally{sheets.forEach(s=>{s.disabled=false;});for(const [node,p,v] of important)node.style.setProperty(p,v.applied,'important');}
+    try {
+      for(const [node,entry] of this.inlines)for(const [prop,value] of entry.important)if(node.style.getPropertyValue(prop)===value.applied && node.style.getPropertyPriority(prop)==='important'){important.push([node,prop,value]);node.style.setProperty(prop,value.original,'important');}
+      sheets.forEach(s=>{s.disabled=true;});
+      return callback();
+    } finally {
+      sheets.forEach(s=>{s.disabled=false;});
+      for(const [node,p,v] of important)node.style.setProperty(p,v.applied,'important');
+      // Commit the restored colors before removing the guard, so restoring the
+      // dark output cannot start a light-to-dark transition on the next paint.
+      void document.documentElement.offsetHeight;
+      guards.forEach(style=>style.remove());
+    }
   }
   disable() {
     this.active=false;this.epoch++;clearTimeout(this.timer);this.timer=0;

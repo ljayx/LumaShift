@@ -48,36 +48,31 @@ function pageSurface(x,y,layers) {
   return document.body||document.documentElement;
 }
 
-// No paint can occur between disabling and restoring the sheets in this task.
-// Current website CSS remains the source of truth, including changes made while on.
+// ThemeEngine.withOriginal owns the temporary stylesheet/inline restoration.
+// In particular, its transition guard must stay enabled while we sample.
 export function inspectOriginal(previous=false) {
-  const sheets=[...document.querySelectorAll('style[data-lumashift]')].map(n=>n.sheet).filter(Boolean);
-  const enabled=sheets.filter(s=>!s.disabled);
-  enabled.forEach(s=>{s.disabled=true;});
-  try {
-    const targets=new Set([document.documentElement,document.body].filter(Boolean));
-    const levels=[],layers=new Map();
-    for(const x of [0.2,0.5,0.8]) for(const y of [0.2,0.5,0.8]) {
-      let node=pageSurface(innerWidth*x,innerHeight*y,layers);
-      if(!node)continue;
-      if(node.closest('img,video,canvas,svg,iframe')) node=node.parentElement;
-      if(!node)continue;
-      levels.push(luminance(background(node)));
-      // Observe a bounded set of representative wrapper attributes, not all DOM.
-      for(let p=node,depth=0;p && depth<6;p=p.parentElement,depth++) {
-        if(targets.has(p))continue;
-        const box=p.getBoundingClientRect();
-        // Tiny cards/cells changing color are content updates, not a site-wide
-        // theme switch. Watch large containers and roots instead.
-        if(box.width*box.height>=innerWidth*innerHeight*0.2)targets.add(p);
-      }
+  const targets=new Set([document.documentElement,document.body].filter(Boolean));
+  const levels=[],layers=new Map();
+  for(const x of [0.2,0.5,0.8]) for(const y of [0.2,0.5,0.8]) {
+    let node=pageSurface(innerWidth*x,innerHeight*y,layers);
+    if(!node)continue;
+    if(node.closest('img,video,canvas,svg,iframe')) node=node.parentElement;
+    if(!node)continue;
+    levels.push(luminance(background(node)));
+    // Observe a bounded set of representative wrapper attributes, not all DOM.
+    for(let p=node,depth=0;p && depth<6;p=p.parentElement,depth++) {
+      if(targets.has(p))continue;
+      const box=p.getBoundingClientRect();
+      // Tiny cards/cells changing color are content updates, not a site-wide
+      // theme switch. Watch large containers and roots instead.
+      if(box.width*box.height>=innerWidth*innerHeight*0.2)targets.add(p);
     }
-    if(!levels.length)levels.push(luminance(background(document.body||document.documentElement)));
-    const darkFraction=levels.filter(v=>v<0.18).length/levels.length;
-    const lightFraction=levels.filter(v=>v>0.3).length/levels.length;
-    const nativeDark=previous ? lightFraction<0.55 : darkFraction>=0.7;
-    return {nativeDark,targets};
-  } finally {enabled.forEach(s=>{s.disabled=false;});}
+  }
+  if(!levels.length)levels.push(luminance(background(document.body||document.documentElement)));
+  const darkFraction=levels.filter(v=>v<0.18).length/levels.length;
+  const lightFraction=levels.filter(v=>v>0.3).length/levels.length;
+  const nativeDark=previous ? lightFraction<0.55 : darkFraction>=0.7;
+  return {nativeDark,targets};
 }
 
 export function themeWatcher(onChange,targets) {
