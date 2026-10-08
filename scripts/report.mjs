@@ -44,7 +44,7 @@ if(complete) {
   const trend=enabled.cases.find(c=>c.size==='standard').toggleTrend;
   row('第 10→100 次切换 GC 堆增长',trend.find(t=>t.cycle===100).heapMiB-trend.find(t=>t.cycle===10).heapMiB,5,'MiB');
 } else text+='\n## 性能测量\n\n当前没有完整的三组数据。先单独运行 `npm run test:perf`，再重新生成报告。\n';
-text+='\n## 已知限制与未验证项目\n\n- Chrome 最低支持版本 120、实际工具栏操作、Windows、严格冷启动闪白录像、全进程 CPU 和数小时运行需要独立验证。\n- 真实网站抽查单独使用 `npm run test:sites`；登录后页面、复杂业务表单、网络视频和无限滚动未全面验收。访问失败或验证码页面不算通过。\n- 封闭 Shadow DOM、晚赋值 adoptedStyleSheets、部分 CSSOM 直接属性赋值、关键帧颜色与复杂颜色表达式可能保持原样。\n- 不重绘 Canvas/WebGL；图片背景、Logo、混合模式及元素整体透明度仍可能影响局部可读性。\n- 无法读取、超过 2 MiB 的样式表以及跨域 CSS @import 可能无法完整转换；巨大单个样式表的规则解析仍同步执行。\n- Chrome 内部页、扩展商店、PDF 阅读器、file 页面和无痕模式不在支持范围。\n\n复现步骤见 [测试矩阵](test-matrix.md)，指标定义见 [性能预算](performance-budget.md)。\n';
-await writeFile('docs/test-report.md',text);
-console.log('Wrote docs/test-report.md');
+text+='\n## 测量范围\n\n结果仅适用于输入数据对应的版本和测试环境；真实网站、严格冷启动、全进程 CPU 和数小时运行仍需单独验证。使用和兼容性说明见 [README](../README.md)，复现命令见 [贡献指南](../CONTRIBUTING.md)。\n';
+await writeFile('test-results/report.md',text);
+console.log('Wrote test-results/report.md');
 if(failed)process.exitCode=1;

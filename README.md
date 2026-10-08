@@ -11,7 +11,7 @@ LumaShift 是 Chrome Manifest V3 扩展，使用独立样式规则引擎将亮�
 [![CI](https://github.com/ljayx/LumaShift/actions/workflows/ci.yml/badge.svg)](https://github.com/ljayx/LumaShift/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-当前版本 **0.1.0，开发中**。复杂网站仍可能存在局部显示问题，已知边界和实际验证结果见[测试报告](docs/test-report.md)。
+当前版本 **0.1.0，开发中**。复杂网站仍可能存在局部显示问题，支持范围见下方说明，自动化检查结果见 [GitHub Actions](https://github.com/ljayx/LumaShift/actions/workflows/ci.yml)。
 
 ## 功能
 
@@ -62,6 +62,8 @@ npm run build
 
 网站规则按顶层页面的完整主机名保存，子域名分开。Chrome 内部页、扩展商店、PDF 阅读器、file 页面和无痕模式不在支持范围。
 
+部分复杂 CSS、封闭 Shadow DOM、动态替换的 adoptedStyleSheets、无法读取或超过 2 MiB 的样式表可能无法完整转换。图片、Canvas、WebGL 和视频内容不会重新着色；图片上的文字、混合模式及透明元素仍可能有局部可读性问题。自动识别不准确时，可通过网站规则选择「强制转换」或「保持原样」。
+
 ## 开发与测试
 
 ```bash
@@ -80,12 +82,12 @@ Linux 缺少系统依赖时使用 `npx playwright install --with-deps chromium`�
 | `npm run test:perf` | 比较未加载扩展、关闭转换、开启转换三种状态 |
 | `npm run test:sites` | 访问公开网站抽查兼容性，需要网络 |
 | `npm run profile` | 记录 LumaShift 的 CPU profile |
-| `npm run report` | 汇总本地回归和可选性能数据 |
+| `npm run report` | 将本地回归和可选性能数据汇总到 test-results/report.md |
 | `npm run serve` | 启动手工测试页 http://localhost:4173 |
 
 浏览器测试共用 4173 端口，使用临时独立浏览器资料，不读取个人 Chrome 数据。请顺序执行，性能测试应单独运行。测试结果、截图与 profile 写入 test-results/，不提交 Git；GitHub Actions 保存回归证据和可加载的扩展产物。
 
-性能结果是可控页面上的主线程、JS 堆和进程 RSS 测量，不能推广为全部网站或长时间运行结论。固定指标见[性能预算](docs/performance-budget.md)。
+性能脚本记录首屏、切换、主线程 CPU、GC 后 JS 堆、进程 RSS 和多标签页开销。测量口径随原始数据和本地报告输出，不能推广为全部网站、严格冷启动或数小时运行结论。
 
 ## 代码结构
 
@@ -93,15 +95,12 @@ Linux 缺少系统依赖时使用 `npx playwright install --with-deps chromium`�
 src/              扩展源码、Popup 和图标
 scripts/          构建、浏览器测试和性能工具
 tests/            单元测试和可控 HTML/CSS 页面
-docs/             设计、需求、验证记录与已知限制
-assets/branding/  图标源图与生成说明
+assets/           图标源图与展示截图
 licenses/         开发工具许可证
 ```
-
-从[技术方案](docs/approach.md)了解引擎和权限设计；[测试矩阵](docs/test-matrix.md)提供手工复现步骤。docs/ 中的专题修复记录保留各自的测试日期，不代表每次构建都已重测所有场景。
 
 ## 贡献与许可
 
 欢迎提交 [Issue](https://github.com/ljayx/LumaShift/issues) 和 Pull Request，开发约定见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
-本项目采用 [MIT 许可证](LICENSE)。开发工具及素材说明见[第三方依赖与资源](docs/third-party.md)。
+本项目采用 [MIT 许可证](LICENSE)。开发工具 esbuild 使用 [MIT 许可证](licenses/esbuild-MIT.txt)，Playwright 使用 [Apache-2.0 许可证](licenses/Playwright-Apache-2.0.txt)；它们不随扩展分发。间接依赖的许可保留在各 npm 包中，Chromium 的许可随浏览器发行包保留。图标源图位于 assets/branding/，由生成式图像工具创建。

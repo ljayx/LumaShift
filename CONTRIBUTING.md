@@ -23,7 +23,7 @@ Linux 缺少浏览器系统依赖时，使用 `npx playwright install --with-dep
 - 颜色、声明解析和设置逻辑修改运行 `npm test`；引擎、主题识别、权限及 Popup 修改运行 `npm run test:browser`。
 - 修复网页兼容性问题时，在 tests/fixtures/ 添加最小复现，不提交登录态、业务数据或完整网页抓取。
 - 调度或缓存改动运行 `npm run test:perf`，注明设备、浏览器和测量口径。性能测试须单独顺序执行，不与其他测试或重负载任务同时运行。
-- 测试结果、截图和 CPU profile 写入本地 test-results/，不加入 Git。运行 `npm run report` 可更新汇总；提交报告前确认它对应当前代码。
+- 测试结果、截图和 CPU profile 写入本地 test-results/，不加入 Git。运行 `npm run report` 生成 test-results/report.md；分享结果时注明对应的提交和测试环境。
 
 提交 Pull Request 时说明问题、修改后的行为、验证方式及剩余限制。保持修改集中，并保留依赖锁文件；生产包的输入应全部来自 src/。
 
