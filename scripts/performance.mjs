@@ -1,16 +1,13 @@
-import {mkdir,writeFile,readFile} from 'node:fs/promises';
+import {mkdir,writeFile} from 'node:fs/promises';
 import {execFileSync} from 'node:child_process';
 import os from 'node:os';
 import {serve} from './serve.mjs';
 import {launch,settings,waitStatus,settle} from './browser.mjs';
-import {buildBaseline} from './baseline.mjs';
 
 const server=await serve();
 await mkdir('test-results',{recursive:true});
-const baseline=await buildBaseline();
-const report={date:new Date().toISOString(),cpu:os.cpus()[0].model,cores:os.cpus().length,memoryGiB:os.totalmem()/1024**3,os:`${os.platform()} ${os.release()}`,viewport:'1280x900',windowMs:5000,repeats:5,notes:['Dark Reader API 4.9.132, same theme/host control and CSS fetch bridge; image analysis off in both. Not the full store extension.','Main-thread TaskDuration and GC JS heap are proxies; process RSS separately recorded. No claim about all-process CPU or hours-long memory.'],groups:[]};
-const groups=process.env.PERF_GROUPS?.split(',')||['disabled','off','lumashift','darkreader'];
-if(process.env.PERF_GROUPS) {const previous=JSON.parse(await readFile('test-results/performance.json','utf8'));Object.assign(report,previous);report.groups=previous.groups.filter(g=>!groups.includes(g.name));}
+const report={date:new Date().toISOString(),cpu:os.cpus()[0].model,cores:os.cpus().length,memoryGiB:os.totalmem()/1024**3,os:`${os.platform()} ${os.release()}`,viewport:'1280x900',windowMs:5000,repeats:5,notes:['Main-thread TaskDuration and GC JS heap are proxies; process RSS separately recorded. No claim about all-process CPU or hours-long memory.'],groups:[]};
+const groups=['disabled','off','lumashift'];
 const metrics=async session=>Object.fromEntries((await session.send('Performance.getMetrics')).metrics.map(m=>[m.name,m.value]));
 const memory=async session=>{await session.send('HeapProfiler.collectGarbage');return (await metrics(session)).JSHeapUsedSize/1024**2;};
 const summarize=values=>{const sorted=[...values].sort((a,b)=>a-b);return {samples:values,median:sorted[Math.floor(sorted.length/2)],p95:sorted[Math.ceil(sorted.length*.95)-1]};};
@@ -56,7 +53,7 @@ async function repeatedProbe(page,session,dynamic=false) {
 try {
   for(const name of groups) {
     console.log('MEASURING',name);
-    const browser=await launch(name==='disabled'?false:name==='darkreader'?baseline:true);
+    const browser=await launch(name!=='disabled');
     const {context,worker}=browser;report.browser=context.browser().version();
     const group={name,measuredAt:new Date().toISOString(),cases:[]};report.groups.push(group);
     try {
@@ -70,12 +67,12 @@ try {
         const samples=[];
         for(let i=0;i<5;i++) {
           await page.goto(`http://localhost:4173/?${size==='large'?'large&':''}run=${i}`);
-          if(name==='lumashift'||name==='darkreader')await page.waitForFunction(()=>window.__timing.stable!==null,{},{timeout:5000});
+          if(name==='lumashift')await page.waitForFunction(()=>window.__timing.stable!==null,{},{timeout:5000});
           await page.waitForTimeout(150);
           samples.push(await page.evaluate(()=>({...window.__timing,domContentLoaded:performance.getEntriesByType('navigation')[0].domContentLoadedEventEnd})));
         }
         const result={size,navigation:samples,heapMiB:await memory(session),idle:await repeatedProbe(page,session),dynamic:await repeatedProbe(page,session,true),switchMs:null};
-        if(name==='lumashift'||name==='darkreader') {
+        if(name==='lumashift') {
           const switches=[];
           for(let i=0;i<10;i++) {
             const enabled=i%2===1;

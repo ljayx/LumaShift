@@ -1,4 +1,4 @@
-import {luminance} from './settings.js';
+import {luminance,contrast} from './settings.js';
 import {splitCSS} from './declarations.js';
 
 const clamp=(n,a=0,b=1)=>Math.max(a,Math.min(b,n));
@@ -32,6 +32,11 @@ export function parseSimple(value) {
 
 export function createPalette(background,text,parseFallback=()=>null) {
   const bg=parseSimple(background),fg=parseSimple(text);
+  // Selection is an interaction highlight, not a recessed page surface. Use
+  // an opaque pair so site alpha and the user's text color cannot wash it out.
+  const selection=contrast(background,'#8ab4f8')>=contrast(background,'#264f78')
+    ?{background:'#8ab4f8',text:'#101828'}
+    :{background:'#264f78',text:'#ffffff'};
   const [bh,bs,bl]=toHSL(bg),[th,ts,tl]=toHSL(fg);
   const cache=new Map();
   // Pure-black themes need more lift for the same visible separation.
@@ -146,7 +151,7 @@ export function createPalette(background,text,parseFallback=()=>null) {
     const edge=lengths.length>=2 && (lengths.length===2 || parseFloat(lengths[2])===0);
     return rewrite(part,edge?'border':'shadow');
   }).join(',');
-  return {map,rewrite,variable,shadow};
+  return {map,rewrite,variable,shadow,selection};
 }
 
 export function propertyRole(property) {

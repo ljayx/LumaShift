@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<title>LumaShift · Text selection</title>
+<style>
+  body { margin:32px; background:#fff; color:#222; font:16px/1.8 system-ui,sans-serif; }
+  section { padding:16px 20px; margin:16px 0; border:1px solid #ddd; }
+  .document ::selection { background:rgba(60,110,220,.18); }
+  #important::selection { background:#cce0ff!important; color:#fff!important; text-shadow:0 0 2px red!important; }
+  #mixed::selection, :is(.ordinary, .ordinary-alias) { background:#d1e7dd; color:#222; }
+  #variable { --highlight:rgba(0,100,255,.12); }
+  #variable::selection { background:var(--highlight); }
+  #fill { -webkit-text-fill-color:#555; }
+  @layer website { #layered::selection { background:transparent!important; color:red!important; } }
+  @media (min-width:600px) { #conditional::selection { background:rgba(0,0,255,.1)!important; } }
+  .nested { &::selection { background:rgba(50,100,200,.12); } }
+</style>
+<h1>文本选择可读性</h1>
+<section class="document">
+  <div>示例应用配置：</div>
+  <a href="#reference">配置说明</a>
+  <div id="example">应用的默认主题由 THEME_* 配置项控制；选中文字应保持清晰可读。</div>
+  <div>拖动鼠标选择这段文字，检查高亮与页面背景的区别。</div>
+</section>
+<section>
+  <div id="default">没有自定义选中色：普通文字、<a href="#link">链接</a>与 <code>THEME_COLOR</code></div>
+  <div id="important">高优先级的网页选中色</div>
+  <div id="mixed">选中伪元素与普通元素共用规则</div>
+  <div class="ordinary">普通浅绿色提示区域</div>
+  <div id="variable">变量和透明度选中色</div>
+  <div id="fill">使用 text-fill-color 的文字</div>
+  <div id="layered">CSS layer 内的选中色</div>
+  <div id="conditional">媒体查询内的选中色</div>
+  <div class="nested">嵌套规则的选中色</div>
+  <textarea>表单中的文字选择</textarea>
+  <div id="shadow"></div>
+</section>
+</html>

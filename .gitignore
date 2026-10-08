@@ -5,7 +5,7 @@ dist/
 # Local caches and temporary test profiles
 .cache/
 .test-profiles/
-test-results/tmp/
+test-results/
 
 # Local configuration and logs
 .env
@@ -15,3 +15,8 @@ test-results/tmp/
 
 # macOS metadata
 .DS_Store
+
+# Local editor settings and profiling artifacts
+.vscode/
+.idea/
+*.cpuprofile

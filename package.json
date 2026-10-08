@@ -10,13 +10,35 @@
     "test:e2e": "node scripts/e2e.mjs",
     "test:dark": "node scripts/dark-regressions.mjs",
     "test:surfaces": "node scripts/surfaces.mjs",
+    "test:selection": "node scripts/selection.mjs",
     "test:perf": "node scripts/performance.mjs",
-    "test:paired": "node scripts/paired-performance.mjs",
     "test:sites": "node scripts/real-sites.mjs",
     "report": "node scripts/report.mjs",
-    "prototype": "node scripts/prototype.mjs",
-    "serve": "node scripts/serve.mjs"
+    "serve": "node scripts/serve.mjs",
+    "test:browser": "npm run test:e2e && npm run test:dark && npm run test:surfaces && npm run test:selection",
+    "check": "npm run build && npm test",
+    "profile": "node scripts/profile.mjs"
   },
-  "devDependencies": { "darkreader": "4.9.132", "esbuild": "0.25.12", "playwright": "1.58.2" },
-  "engines": { "node": ">=22" }
+  "devDependencies": {
+    "esbuild": "0.25.12",
+    "playwright": "1.58.2"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ljayx/LumaShift.git"
+  },
+  "homepage": "https://github.com/ljayx/LumaShift#readme",
+  "bugs": {
+    "url": "https://github.com/ljayx/LumaShift/issues"
+  },
+  "keywords": [
+    "chrome-extension",
+    "dark-mode",
+    "manifest-v3",
+    "privacy"
+  ]
 }

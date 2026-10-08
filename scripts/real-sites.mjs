@@ -4,7 +4,7 @@ import {launch,settings,waitStatus,getStatus} from './browser.mjs';
 const sites=[
   {id:'linuxdo',url:'https://linux.do/t/topic/2960445',kind:'论坛 / 浅色提示与评论胶囊',selector:'#post_1',surfaces:['#global-notice-alert-global-notice','.discourse-boosts__bubble']},
   {id:'wikipedia',url:'https://en.wikipedia.org/wiki/Web_browser',kind:'Wiki / 内容',selector:'#firstHeading'},
-  {id:'github',url:'https://github.com/darkreader/darkreader',kind:'开发者 / 代码',selector:'main'},
+  {id:'github',url:'https://github.com/ljayx/LumaShift',kind:'开发者 / 代码',selector:'main'},
   {id:'hn',url:'https://news.ycombinator.com/',kind:'新闻 / 社区',selector:'.titleline'},
   {id:'mdn',url:'https://developer.mozilla.org/en-US/docs/Web/CSS',kind:'文档',selector:'main'},
   {id:'baidu',url:'https://www.baidu.com/s?wd=Chrome',kind:'搜索',selector:'#content_left'},

@@ -1,31 +1,8 @@
 # 技术方案与决策
 
-## 核心目标
+LumaShift 使用独立样式规则引擎，在保持内容可读、页面交互和颜色语义的前提下控制 CPU 与内存开销。生产运行时没有第三方 JavaScript 依赖，构建会检查所有打包输入均来自 src/。
 
-在良好视觉质量和兼容性的前提下改善 Dark Reader 的页面性能和内存开销。体积更小、界面不同或配置更少均不能作为达成目标的证据。原始需求保持在 requirements.md；用户补充的性能比较目标记录于此。
-
-## 调研和选择
-
-资料查阅日期：2026-09-23。
-
-| 路线 | 视觉与兼容性 | CPU、内存及动态处理取舍 | 选择 |
-|---|---|---|---|
-| 全页 CSS Filter（Dark Reader 的早期路线） | 混合明暗反转、媒体补偿及层叠风险 | 初始设置简单，合成和滚动代价仍需测量 | 不采用 |
-| 静态通用覆盖（Static 路线） | 层级、语义色与局部背景容易丢失 | 少量规则，资源成本低，复杂页面差 | 仅作原型比较 |
-| Dark Reader 动态 API | 通用处理成熟，颜色变量、动态与复杂页面支持较多 | 全量引入其样式分析、观察器、缓存；不能假定改善原产品开销 | 只作为开发对照组，不进入生产包 |
-| Midnight Lizard | 可分别配置背景、文字、边框等，提供面向重页面的 Simplified 模式 | 展示功能完整度与简化模式的取舍；未做其性能实测 | 参考，不复用 |
-| LumaShift 独立样式规则引擎 | 保留 CSS 选择器、状态、层叠和颜色语义；复杂场景边界必须独立验收 | 以样式规则为主要工作量；只增量处理新节点和行内颜色；有界缓存与分片处理 | 当前实现，验收以实际结果为准 |
-
-来源：
-
-- [Dark Reader 动态模式设计](https://darkreader.org/blog/dynamic-theme/)
-- [Filter 模式与适用场景](https://darkreader.org/blog/filter-mode/)
-- [Dark Reader 源码与 API](https://github.com/darkreader/darkreader)
-- [Midnight Lizard 源码与说明](https://github.com/Midnight-Lizard/Midnight-Lizard)
-- [Chrome content scripts](https://developer.chrome.com/docs/extensions/develop/concepts/content-scripts)
-- [Playwright 扩展测试](https://playwright.dev/docs/chrome-extensions)
-
-这些资料用于理解路线，不作为本项目性能结论。原型实际输出在 test-results/prototype.json 及对应截图；它只证明单页转换和恢复可运行。正式构建由 esbuild 元数据校验不存在 darkreader 输入。
+相较全页反色和静态颜色覆盖，规则转换能保留选择器、层叠与状态。性能和兼容性仍以实测为准，完整需求见 [requirements.md](requirements.md)。
 
 ## 独立引擎
 
@@ -57,14 +34,10 @@ Manifest V3、原生 Popup 和休眠式 service worker。storage.local 按设置
 - CSS 动画内部关键帧、复杂图片背景、跨域 CSS 中 @import、晚装载的 adoptedStyleSheets 赋值、仅直接 JS 属性赋值引起的 CSSOM 变动等仍有边界，详见验收记录，不宣称全面兼容。
 - Canvas/WebGL/视频内容不改像素；Chrome 内部页、扩展商店、PDF 阅读器、file 和无痕不在支持范围。
 
-## 性能验收
+## 性能测量
 
-预算在原型测试前固定于 performance-budget.md。performance.mjs 对照未加载扩展、安装但关闭、LumaShift 开启、Dark Reader API 开启。API 对照使用相同配置控制、配色和 CSS 读取桥，双方均不分析图片；不能把该结果宣传成完整商店扩展的等价比较。
+[性能预算](performance-budget.md)定义首次生效、切换、CPU、内存和多标签页的测量口径。脚本比较未加载扩展、安装但关闭、开启转换三种状态；原始结果在本地 test-results/ 生成，不随源码提交。
 
-样本数据、测量口径、通过与未通过项统一写入测试报告。真实 Chrome 稳定版、长时间运行、全进程 CPU 和实际网站覆盖不足时，保持未验收状态。
+行内声明采用差量更新；插件自身写入通过最终 style 字符串识别。SPA 的实际内容和主题变化由 DOM/CSS 观察处理，单纯 URL 变化不会触发全页重新扫描。
 
-## 性能排查记录
-
-在可控动态页的首轮结果中，LumaShift 的 JS 堆低于 API 对照，但动态 CPU 更高，因此未把第一轮当作性能目标完成。先改为行内生成声明差量写入，再通过 CPU profile 发现将 history.replaceState 当成样式变动会触发全表重算及原主题采样。现已移除此误触发；SPA 的实际内容和主题变化由 DOM/CSS 观察处理，不因 URL 字符串变化扫描全页。中间数据及两份 cpuprofile 保留用于追溯。
-
-后续将前台有界队列合并到绘制前，并用最终 style 字符串识别插件自身写入，避免每次 MutationObserver 回调逐属性读取值与优先级；旧式 bgcolor/color/text 属性另行记录，保留对站点修改的响应。每次核心改动均重新运行相关浏览器回归。交替引擎顺序的补充对照用于检查测量波动，不能用挑选单轮的方式证明 CPU 改善。
+数小时运行、全进程 CPU、Chrome 最低版本和真实网站覆盖仍需独立验收，不把可控页面结果推广为全部网站结论。

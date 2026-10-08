@@ -1,10 +1,11 @@
 import {serve} from './serve.mjs';
 import {launch} from './browser.mjs';
-import {writeFile} from 'node:fs/promises';
+import {mkdir,writeFile} from 'node:fs/promises';
+await mkdir('test-results',{recursive:true});
 const server=await serve();
 try {
-  for(const name of ['lumashift','darkreader']) {
-    const browser=await launch(name==='lumashift'?true:'.cache/darkreader-baseline');
+  for(const name of ['lumashift']) {
+    const browser=await launch();
     try {
       const page=await browser.context.newPage();await page.goto('http://localhost:4173/?large');await page.waitForTimeout(500);
       const cdp=await browser.context.newCDPSession(page);await cdp.send('Profiler.enable');await cdp.send('Profiler.start');

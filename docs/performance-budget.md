@@ -27,4 +27,4 @@
 
 最终 CPU 测量每种状态、每种页面各做 3 个 5 秒窗口，报告中位数并保留原始窗口。首次生效采用同一全新 profile 内 5 次新文档导航；它不是每次都重启浏览器和清空所有缓存的严格冷启动，所以上述“冷导航”不能解读为全冷启动已验证。严格冷启动与实际屏幕闪白仍需补测。
 
-Playwright 默认会禁用后台节流；最终测量移除了这三项禁用参数，保留 Chrome 的后台调度。首轮探索数据保存为 performance-first-pass.json，最终对照为 performance.json，二者测试调度与重复次数不同，不能混作严格的前后优化比值。Dark Reader 基线另作了必要的 Chrome Promise 返回适配，否则其 API 对 runtime.sendMessage 的包装会导致控制消息无结果；不改其颜色/观察/缓存算法。
+Playwright 默认会禁用后台节流；性能脚本移除了这三项禁用参数，保留 Chrome 的后台调度。每次完整运行重新测量全部三组，避免将不同构建或环境的结果拼接。原始结果写入本地 test-results/performance.json。

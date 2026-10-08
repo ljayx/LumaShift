@@ -1,5 +1,5 @@
 import {createPalette,parseSimple,propertyRole} from './colors.js';
-import {declarations,sourceDeclarations,hasPendingColors,isThinPaint} from './declarations.js';
+import {declarations,sourceDeclarations,hasPendingColors,isThinPaint,splitCSS} from './declarations.js';
 
 const marker='data-lumashift';
 const roles=['bg','text','border','shadow'];
@@ -35,6 +35,8 @@ export class ThemeEngine {
       const simple=parseSimple(context.fillStyle);if(simple)return simple;
       context.clearRect(0,0,1,1);context.fillRect(0,0,1,1);const bytes=context.getImageData(0,0,1,1).data;return [...bytes.slice(0,3),bytes[3]/255];
     });
+    const selection=this.palette.selection;
+    this.selectionDeclarations=`background-color:${selection.background}!important;color:${selection.text}!important;-webkit-text-fill-color:${selection.text}!important;text-shadow:none!important`;
     this.addRoot(document);
     this.sheetChanged=event=>{
       if(event.target?.hasAttribute?.(marker))return;
@@ -53,7 +55,7 @@ export class ThemeEngine {
   addRoot(root) {
     if(this.roots.has(root)||!this.active)return;
     const {background,text}=this.settings;
-    const base=this.makeStyle(root,(root===document?`html{background:${background};color:${text};color-scheme:dark}body{background:${background};color:${text}}`:'')+`:where(a:link){color:${this.palette.map('#0000ee','text')}}:where(a:visited){color:${this.palette.map('#551a8b','text')}}:where(svg){fill:currentColor}input,textarea,select,button{background-color:${background};color:${text};border-color:#526071}::selection{background:#34547b;color:${text}}\n${inlineRules}\n${legacyRules}\n${svgRules}`);
+    const base=this.makeStyle(root,(root===document?`html{background:${background};color:${text};color-scheme:dark}body{background:${background};color:${text}}`:'')+`:where(a:link){color:${this.palette.map('#0000ee','text')}}:where(a:visited){color:${this.palette.map('#551a8b','text')}}:where(svg){fill:currentColor}input,textarea,select,button{background-color:${background};color:${text};border-color:#526071}::selection{${this.selectionDeclarations}}\n${inlineRules}\n${legacyRules}\n${svgRules}`);
     // Low-priority defaults must precede website rules and their generated twins.
     base.parentNode.insertBefore(base,base.parentNode.firstChild);
     this.generated.add(base.sheet);
@@ -163,7 +165,14 @@ export class ThemeEngine {
         const authored=sources.get(rule.cssText)?.shift();
         const declaration=this.declarations(rule.style,rule.parentStyleSheet?.href,authored);
         const nested=rule.cssRules?.length?this.rules(rule.cssRules,depth+1,sources):'';
-        if(declaration||nested)out.push(`${rule.selectorText}{${declaration}${nested?';'+nested:''}}`);
+        // Keep the site's specificity and conditional/layer scope, including
+        // important rules. Split mixed lists so ordinary elements stay ordinary.
+        if(/::selection\b/i.test(rule.selectorText)) {
+          const selectors=splitCSS(rule.selectorText,','),selection=[],ordinary=[];
+          for(const selector of selectors)(/::selection\s*$/i.test(selector)?selection:ordinary).push(selector);
+          if(ordinary.length && (declaration||nested))out.push(`${ordinary.join(',')}{${declaration}${nested?';'+nested:''}}`);
+          if(selection.length)out.push(`${selection.join(',')}{${declaration};${this.selectionDeclarations}${nested?';'+nested:''}}`);
+        } else if(declaration||nested)out.push(`${rule.selectorText}{${declaration}${nested?';'+nested:''}}`);
       } else if(rule.type===CSSRule.IMPORT_RULE) {
         try {const content=this.rules(rule.styleSheet.cssRules,depth+1);out.push(rule.media.mediaText?`@media ${rule.media.mediaText}{${content}}`:content);} catch {this.failed.add('import');}
       } else if(rule.cssRules && rule.type!==CSSRule.KEYFRAMES_RULE) {

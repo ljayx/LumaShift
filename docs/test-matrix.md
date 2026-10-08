@@ -29,7 +29,7 @@
 | 页面 | 初始设置 | 操作流程 | 覆盖类别 |
 |---|---|---|---|
 | https://en.wikipedia.org/wiki/Web_browser | 浏览器浅色偏好，插件关闭 | 阅读文章 → 开转换 → 滚动 → 强制转换 → 关闭；补测网站原生三种主题 | Wiki、内容、表格 |
-| https://github.com/darkreader/darkreader | 同上，无登录 | 阅读 README → 滚动代码 → 开/关；补测菜单及原生主题切换 | 开发者、代码 |
+| https://github.com/ljayx/LumaShift | 同上，无登录 | 阅读 README → 滚动代码 → 开/关；补测菜单及原生主题切换 | 开发者、代码 |
 | https://news.ycombinator.com/ | 原始浅色 | 列表 → 开转换 → 评论页 → 关闭恢复 | 新闻、社区 |
 | https://developer.mozilla.org/en-US/docs/Web/CSS | 浏览器浅色偏好 | 阅读 → 展开 details → 滚动 → 开/关；补测原生主题 | 文档 |
 | https://www.baidu.com/s?wd=Chrome | 无登录，原始主题 | 搜索结果 → 开转换 → 滚动 → 关闭 | 搜索 |
