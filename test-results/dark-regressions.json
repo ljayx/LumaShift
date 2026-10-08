@@ -1,5 +1,5 @@
 {
-  "date": "2026-09-24T13:58:02.557Z",
+  "date": "2026-09-28T09:04:58.473Z",
   "results": [
     {
       "name": "SVG attributes, inherited defaults, symbols and gradient stops",
@@ -27,10 +27,6 @@
     },
     {
       "name": "disable restores latest site values and removes generated attributes",
-      "status": "passed"
-    },
-    {
-      "name": "reference site stylesheet: card document outer surface",
       "status": "passed"
     }
   ],

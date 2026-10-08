@@ -16,7 +16,7 @@ try {
   await settings(worker,{'site:localhost':'force'});
   await page.goto('http://localhost:4173/dark-regressions.html');await waitStatus(worker,page,'active');
   await page.waitForTimeout(200);
-  await page.waitForFunction(()=>getComputedStyle(document.querySelector('.external-surface')).backgroundColor==='rgb(24, 28, 37)');
+  await page.waitForFunction(()=>getComputedStyle(document.querySelector('.external-surface')).backgroundColor==='rgb(29, 33, 43)');
   await test('SVG attributes, inherited defaults, symbols and gradient stops',async()=>{
     assert.ok(bright(await css('#stroke-icon rect:first-child','stroke')));
     assert.ok(bright(await css('#stroke-icon rect:last-child','fill')));
@@ -44,7 +44,7 @@ try {
     assert.equal(await css('.sheet-surface','background-size'),'cover');
     assert.equal(await css('#inline-surface','background-size'),'cover');
     assert.equal(await css('.sheet-surface','background-position'),'100% 100%');
-    assert.equal(await css('.external-surface','background-color'),'rgb(24, 28, 37)');
+    assert.equal(await css('.external-surface','background-color'),'rgb(29, 33, 43)');
     assert.equal(await css('.external-surface','background-position'),'100% 100%');
     assert.equal(await css('#inline-surface','background-position'),'100% 100%');
     assert.ok(luminance(parseSimple(await css('.pseudo','background-color','::before')))<.08);
@@ -106,7 +106,7 @@ try {
       const main=document.createElement('main');main.id='reference-surface';main.className='mp-layout-main';main.setAttribute('data-card-theme','gray');document.body.append(main);
       const navigation=document.createElement('div');navigation.className='mp-navigation';navigation.innerHTML='<div class="mp-navigation-fold"><div class="mp-navigation-list-container"><ul class="mp-navigation-list"><li id="reference-tick" class="mp-navigation-item"></li></ul></div></div>';document.body.append(navigation);
     },source);
-    await page.waitForFunction(()=>getComputedStyle(document.querySelector('#reference-surface')).backgroundColor==='rgb(24, 28, 37)');
+    await page.waitForFunction(()=>getComputedStyle(document.querySelector('#reference-surface')).backgroundColor==='rgb(29, 33, 43)');
     assert.equal(await css('#reference-surface','background-size'),'cover');
     assert.equal(await css('#reference-surface','background-position'),'100% 100%');
     const tick=parseSimple(await css('#reference-tick','background-color'));assert.ok(tick[0]>150 && tick[3]>=.24);

@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8">
+<title>通用背景层次回归</title>
+<style>
+  :root { --info:#d1f0ff; --chip:#f2f2f2; --channels:209 240 255; }
+  * { box-sizing:border-box; }
+  body { margin:0; padding:36px; background:#fff; color:#222; font:16px/1.6 system-ui,sans-serif; }
+  h1 { margin:0; font-size:28px; } h2 { font-size:18px; margin:22px 0 10px; }
+  p { margin:6px 0; } .muted { color:#666; }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+  .surface { padding:16px; border-radius:8px; }
+  .info { background:var(--info); } .success { background:#d1e7dd; }
+  .warning { background:#fff3cd; } .danger { background:#f8d7da; }
+  .surface a { color:#0000ee; }
+  .violet { background:#eadcff; } .cyan { background:#e0f7ff; }
+  .chips { display:flex; flex-wrap:wrap; gap:10px; padding:12px 0; }
+  .chip { border:0; background:var(--chip); color:#222; border-radius:30px; padding:8px 16px; font:inherit; }
+  .chip:hover { background:#e8e8e8; }
+  .near-white { background:#fafafa; } .gray { background:#eee; } .deeper { background:#ddd; }
+  .nested { background:#fff; padding:12px; border-radius:6px; margin-top:10px; }
+  .clear { background:transparent; }
+  .alpha { background:rgb(209 240 255 / .5); }
+  .channels { background:rgb(var(--channels)); }
+  .pseudo::before { content:'伪元素 · 浅蓝提示'; display:block; background:var(--info); padding:16px; border-radius:8px; }
+  .gradient { background:linear-gradient(90deg,#d1f0ff,#e0f7ff,#fff); padding:16px; border-radius:8px; }
+</style>
+<h1>背景层次与语义颜色</h1>
+<p class="muted">同一套规则覆盖提示、胶囊、卡片、变量、透明度和渐变。</p>
+<h2>语义提示</h2>
+<div class="grid">
+  <div class="surface info">信息提示 · 蓝色<p class="muted">变量声明的浅色背景 · <a href="#details">详情</a></p></div>
+  <div class="surface success">成功提示 · 绿色<p class="muted">低饱和浅色背景 · <a href="#details">详情</a></p></div>
+  <div class="surface warning">注意事项 · 黄色<p class="muted">保留文字可读性 · <a href="#details">详情</a></p></div>
+  <div class="surface danger">错误提示 · 红色</div>
+  <div class="surface violet">附加说明 · 紫色</div>
+  <div class="surface cyan">补充信息 · 青色</div>
+</div>
+<h2>评论胶囊与分类标签</h2>
+<div class="chips">
+  <button class="chip">一条简短评论</button><button class="chip">带灰色背景的分类</button>
+  <button class="chip">悬停时保持层次</button><span class="chip" style="background:#f2f2f2">行内背景</span>
+  <span class="chip" style="background:#f2f2f2!important">Important 背景</span>
+</div>
+<h2>中性色与嵌套层次</h2>
+<div class="grid">
+  <div class="surface near-white">接近白色 · #fafafa<div class="nested">白色内层</div></div>
+  <div class="surface gray">浅灰色 · #eeeeee<div class="nested">白色内层</div></div>
+  <div class="surface deeper">深一档 · #dddddd<div class="nested">白色内层</div></div>
+</div>
+<h2>其他 CSS 表达方式</h2>
+<div class="grid">
+  <div class="surface alpha">50% 透明蓝色</div>
+  <div class="surface channels">RGB 通道变量</div>
+  <div class="pseudo"></div>
+</div>
+<div class="gradient" style="margin-top:12px">渐变应连续过渡到页面底色</div>
+<div class="clear">透明区域不添加底色</div>
+</html>

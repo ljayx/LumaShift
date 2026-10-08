@@ -1,58 +1,7 @@
 {
-  "date": "2026-09-23T02:48:50.197Z",
+  "date": "2026-09-28T09:05:41.009Z",
   "browser": "145.0.7632.6",
   "results": [
-    {
-      "id": "github",
-      "url": "https://github.com/darkreader/darkreader",
-      "kind": "开发者 / 代码",
-      "selector": "main",
-      "initialTheme": "browser light preference; original page colors captured",
-      "status": "smoke-tested",
-      "steps": [
-        "Original page visible and screenshot captured",
-        "Automatic conversion status and screenshot captured",
-        "Force conversion and scroll 550px",
-        "Disabled and confirmed off state without reload"
-      ],
-      "pageErrors": [],
-      "httpStatus": 200,
-      "title": "GitHub - darkreader/darkreader: Dark Reader Chrome and Firefox extension · GitHub",
-      "finalURL": "https://github.com/darkreader/darkreader",
-      "automaticStatus": {
-        "status": "active",
-        "reason": "",
-        "host": "github.com",
-        "mode": "auto"
-      },
-      "reason": "Only listed operations; requires visual review. Native website theme switching, login workflows and real video playback not verified."
-    },
-    {
-      "id": "mdn",
-      "url": "https://developer.mozilla.org/en-US/docs/Web/CSS",
-      "kind": "文档",
-      "selector": "main",
-      "initialTheme": "browser light preference; original page colors captured",
-      "status": "smoke-tested",
-      "steps": [
-        "Original page visible and screenshot captured",
-        "Automatic conversion status and screenshot captured",
-        "Force conversion and scroll 550px",
-        "Toggled document details",
-        "Disabled and confirmed off state without reload"
-      ],
-      "pageErrors": [],
-      "httpStatus": 200,
-      "title": "CSS: Cascading Style Sheets | MDN",
-      "finalURL": "https://developer.mozilla.org/en-US/docs/Web/CSS",
-      "automaticStatus": {
-        "status": "active",
-        "reason": "",
-        "host": "developer.mozilla.org",
-        "mode": "auto"
-      },
-      "reason": "Only listed operations; requires visual review. Native website theme switching, login workflows and real video playback not verified."
-    },
     {
       "id": "baidu",
       "url": "https://www.baidu.com/s?wd=Chrome",
@@ -118,6 +67,38 @@
       "reason": "HTTP error or verification wall; not counted as website compatibility pass"
     },
     {
+      "id": "reddit",
+      "url": "https://www.reddit.com/r/webdev/",
+      "kind": "社区 / 动态列表",
+      "selector": "main",
+      "initialTheme": "browser light preference; original page colors captured",
+      "status": "blocked",
+      "steps": [],
+      "pageErrors": [],
+      "httpStatus": 200,
+      "title": "Reddit - Prove your humanity",
+      "finalURL": "https://www.reddit.com/r/webdev/",
+      "reason": "HTTP error or verification wall; not counted as website compatibility pass"
+    },
+    {
+      "id": "linuxdo",
+      "url": "https://linux.do/t/topic/2960445",
+      "kind": "论坛 / 浅色提示与评论胶囊",
+      "selector": "#post_1",
+      "surfaces": [
+        "#global-notice-alert-global-notice",
+        ".discourse-boosts__bubble"
+      ],
+      "initialTheme": "browser light preference; original page colors captured",
+      "status": "blocked",
+      "steps": [],
+      "pageErrors": [],
+      "httpStatus": 403,
+      "title": "请稍候…",
+      "finalURL": "https://linux.do/t/topic/2960445",
+      "reason": "HTTP error or verification wall; not counted as website compatibility pass"
+    },
+    {
       "id": "wikipedia",
       "url": "https://en.wikipedia.org/wiki/Web_browser",
       "kind": "Wiki / 内容",
@@ -142,7 +123,32 @@
         "mode": "auto"
       },
       "nativeTheme": "verified",
-      "reason": "Only listed operations; native website theme switching verified. Login workflows and real video playback not verified."
+      "reason": "Only listed operations; requires visual review. Native website theme switching, login workflows and real video playback not verified."
+    },
+    {
+      "id": "github",
+      "url": "https://github.com/darkreader/darkreader",
+      "kind": "开发者 / 代码",
+      "selector": "main",
+      "initialTheme": "browser light preference; original page colors captured",
+      "status": "smoke-tested",
+      "steps": [
+        "Original page visible and screenshot captured",
+        "Automatic conversion status and screenshot captured",
+        "Force conversion and scroll 550px",
+        "Disabled and confirmed off state without reload"
+      ],
+      "pageErrors": [],
+      "httpStatus": 200,
+      "title": "GitHub - darkreader/darkreader: Dark Reader Chrome and Firefox extension · GitHub",
+      "finalURL": "https://github.com/darkreader/darkreader",
+      "automaticStatus": {
+        "status": "active",
+        "reason": "",
+        "host": "github.com",
+        "mode": "auto"
+      },
+      "reason": "Only listed operations; requires visual review. Native website theme switching, login workflows and real video playback not verified."
     },
     {
       "id": "hn",
@@ -171,18 +177,30 @@
       "reason": "Only listed operations; requires visual review. Native website theme switching, login workflows and real video playback not verified."
     },
     {
-      "id": "reddit",
-      "url": "https://www.reddit.com/r/webdev/",
-      "kind": "社区 / 动态列表",
+      "id": "mdn",
+      "url": "https://developer.mozilla.org/en-US/docs/Web/CSS",
+      "kind": "文档",
       "selector": "main",
       "initialTheme": "browser light preference; original page colors captured",
-      "status": "blocked",
-      "steps": [],
+      "status": "smoke-tested",
+      "steps": [
+        "Original page visible and screenshot captured",
+        "Automatic conversion status and screenshot captured",
+        "Force conversion and scroll 550px",
+        "Toggled document details",
+        "Disabled and confirmed off state without reload"
+      ],
       "pageErrors": [],
       "httpStatus": 200,
-      "title": "Reddit - Prove your humanity",
-      "finalURL": "https://www.reddit.com/r/webdev/",
-      "reason": "HTTP error or verification wall; not counted as website compatibility pass"
+      "title": "CSS: Cascading Style Sheets | MDN",
+      "finalURL": "https://developer.mozilla.org/en-US/docs/Web/CSS",
+      "automaticStatus": {
+        "status": "active",
+        "reason": "",
+        "host": "developer.mozilla.org",
+        "mode": "auto"
+      },
+      "reason": "Only listed operations; requires visual review. Native website theme switching, login workflows and real video playback not verified."
     }
   ]
 }

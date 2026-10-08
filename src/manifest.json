@@ -4,10 +4,11 @@
   "version": "0.1.0",
   "description": "自然的深色网页，本地处理。支持网站规则、实时配色和原主题恢复。",
   "minimum_chrome_version": "120",
+  "icons": {"16": "icons/icon-16.png", "32": "icons/icon-32.png", "48": "icons/icon-48.png", "128": "icons/icon-128.png"},
   "permissions": ["storage", "scripting", "activeTab"],
   "host_permissions": ["http://*/*", "https://*/*"],
   "background": {"service_worker": "background.js"},
-  "action": {"default_popup": "popup.html", "default_title": "LumaShift · 深色模式"},
+  "action": {"default_popup": "popup.html", "default_title": "LumaShift · 深色模式", "default_icon": {"16": "icons/icon-16.png", "32": "icons/icon-32.png", "48": "icons/icon-48.png", "128": "icons/icon-128.png"}},
   "content_scripts": [
     {"matches":["http://*/*","https://*/*"],"exclude_matches":["https://chromewebstore.google.com/*","https://chrome.google.com/webstore/*"],"js":["proxy.js"],"run_at":"document_start","all_frames":true,"match_origin_as_fallback":true,"world":"MAIN"},
     {"matches":["http://*/*","https://*/*"],"exclude_matches":["https://chromewebstore.google.com/*","https://chrome.google.com/webstore/*"],"js":["content.js"],"run_at":"document_start","all_frames":true,"match_origin_as_fallback":true}

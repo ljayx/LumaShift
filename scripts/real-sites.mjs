@@ -2,6 +2,7 @@ import {mkdir,writeFile,readFile} from 'node:fs/promises';
 import {serve} from './serve.mjs';
 import {launch,settings,waitStatus,getStatus} from './browser.mjs';
 const sites=[
+  {id:'linuxdo',url:'https://linux.do/t/topic/2960445',kind:'论坛 / 浅色提示与评论胶囊',selector:'#post_1',surfaces:['#global-notice-alert-global-notice','.discourse-boosts__bubble']},
   {id:'wikipedia',url:'https://en.wikipedia.org/wiki/Web_browser',kind:'Wiki / 内容',selector:'#firstHeading'},
   {id:'github',url:'https://github.com/darkreader/darkreader',kind:'开发者 / 代码',selector:'main'},
   {id:'hn',url:'https://news.ycombinator.com/',kind:'新闻 / 社区',selector:'.titleline'},
@@ -31,9 +32,11 @@ try {
       } else {
         await page.locator(site.selector).first().waitFor({state:'visible',timeout:5000});
         await page.screenshot({path:`test-results/sites/${site.id}-original.png`});
+        if(site.surfaces)result.originalSurfaces=await page.locator(site.surfaces.join(',')).evaluateAll(nodes=>nodes.slice(0,3).map(n=>({class:n.className,background:getComputedStyle(n).backgroundColor,color:getComputedStyle(n).color})));
         result.steps.push('Original page visible and screenshot captured');
         await settings(browser.worker,{enabled:true});await page.waitForTimeout(1200);result.automaticStatus=await getStatus(browser.worker,page);
         await page.screenshot({path:`test-results/sites/${site.id}-auto.png`});result.steps.push('Automatic conversion status and screenshot captured');
+        if(site.surfaces)result.convertedSurfaces=await page.locator(site.surfaces.join(',')).evaluateAll(nodes=>nodes.slice(0,3).map(n=>({class:n.className,background:getComputedStyle(n).backgroundColor,color:getComputedStyle(n).color})));
         const host=new URL(page.url()).hostname;await settings(browser.worker,{[`site:${host}`]:'force'});await waitStatus(browser.worker,page,'active');await page.waitForTimeout(350);
         await page.mouse.wheel(0,550);await page.waitForTimeout(300);await page.screenshot({path:`test-results/sites/${site.id}-force-scrolled.png`});result.steps.push('Force conversion and scroll 550px');
         if(site.id==='hn') {
